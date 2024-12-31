@@ -28,7 +28,7 @@ int main(void) {
   timer_init();
   
   // Get the file handle for our sprite
-  int fp = dfs_open("/redtank64.sprite");
+  int fp = dfs_open("/redtank128centered.sprite");
   // Allocate a buffer for our file
   sprite_t *redtank = malloc(dfs_size(fp));
   // Load the sprite into the buffer
@@ -65,13 +65,12 @@ int main(void) {
     sprintf(buffer, "vslices: %d\n", redtank->vslices);
     graphics_draw_text( disp, 5, 15, buffer);
     
-    rdp_sync(SYNC_PIPE);
-    rdp_load_texture_stride(0, 0, MIRROR_DISABLED, redtank, 0);
-    rdp_draw_sprite(0, 20, 50, MIRROR_DISABLED);
-
-    rdp_sync(SYNC_PIPE);
-    rdp_load_texture_stride(0, 0, MIRROR_DISABLED, redtank, 1);
-    rdp_draw_sprite(0, 20, 50 + redtank->height/2, MIRROR_DISABLED);
+    int i;
+    for (i = 0; i < redtank->hslices; i++) {
+      rdp_sync(SYNC_PIPE);
+      rdp_load_texture_stride(0, 0, MIRROR_DISABLED, redtank, i);
+      rdp_draw_sprite(0, 20 + redtank->width/redtank->hslices*i, 50, MIRROR_DISABLED);
+    }
 
     rdp_detach_display();
 

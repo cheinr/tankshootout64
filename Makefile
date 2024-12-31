@@ -16,13 +16,11 @@ include $(N64_INST)/include/n64.mk
 all: hello.z64
 .PHONY: all
 
-
-
 $(SPRITE_FILES): $(IMAGE_FILES)
 	@echo "	[MKSPRITE] Processing image" $(notdir $(subst sprite,png,$@))
-	$(TOOLS_MKSPRITE) 16 1 2 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
+	$(TOOLS_MKSPRITE) 16 8 1 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
 
-$(BUILD_DIR)/hello.dfs: $(wildcard $(SOURCE_DIR)/filesystem/*)
+$(BUILD_DIR)/hello.dfs: $(SPRITE_FILES) $(wildcard $(SOURCE_DIR)/filesystem/*)
 
 OBJS = $(BUILD_DIR)/main.o
 
