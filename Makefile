@@ -25,7 +25,7 @@ $(SPRITE_DIR): $(BUILD_DIR)
 $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
 	@echo "SPRITE_FILES: $(SPRITE_FILES)"
 	@echo "	[MKSPRITE] Processing image" $(notdir $(subst sprite,png,$@))
-	$(TOOLS_MKSPRITE) 16 8 1 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
+	$(TOOLS_MKSPRITE) 16 63 10 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
 
 $(BUILD_DIR)/hello.dfs: $(SPRITE_FILES) $(wildcard $(SOURCE_DIR)/filesystem/*)
 
