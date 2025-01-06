@@ -29,6 +29,9 @@ int main(void) {
   rdp_init();
   controller_init();
   timer_init();
+
+  // Allows debugf statements to show up in emulator logs
+  debug_init_isviewer();
   
   // Get the file handle for our sprite
   int fp = dfs_open("/redtank98.sprite");
@@ -41,6 +44,8 @@ int main(void) {
 
   /* Kick off animation update timer to fire thirty times a second */
   new_timer(TIMER_TICKS(1000000 / 30), TF_CONTINUOUS, update_counter);
+
+  debugf("Starting main loop!\n");
   
   /* Main loop test */
   while (1) {
