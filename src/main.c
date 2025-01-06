@@ -62,24 +62,9 @@ int main(void) {
     // Ensure the RDP is ready to receive sprites
     rdp_sync(SYNC_PIPE);
 
-    char buffer[25];
-    sprintf(buffer, "hslices: %d\n", redtank->hslices);
-    graphics_draw_text( disp, 5, 5, buffer);
-    sprintf(buffer, "vslices: %d\n", redtank->vslices);
-    graphics_draw_text( disp, 5, 15, buffer);
-
     int tankWidth = redtank->width/9;
-    sprintf(buffer, "tankwidth: %d\n", tankWidth);
-    graphics_draw_text( disp, 5, 25, buffer);
-    
     int hSlicesPerSprite = redtank->hslices/9; // TODO
-    sprintf(buffer, "hslicesPerSprite: %d\n", hSlicesPerSprite);
-    graphics_draw_text( disp, 5, 35, buffer);
-
     int degrees = (animcounter<<1) % 360;
-
-    sprintf(buffer, "degrees: %d\n", degrees);
-    graphics_draw_text( disp, 5, 45, buffer);
 
     int spriteStart = (degrees % 90) * hSlicesPerSprite;
     int reverseDrawOrder = 0;
