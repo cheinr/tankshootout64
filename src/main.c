@@ -16,6 +16,9 @@ const uint32_t DOUBLE_BUFFERING = 2;
 int main(void) {
   display_context_t disp;
 
+  int resolution_x = 320;
+  int resolution_y = 240;
+
   /* Initialize subsystems */
   display_init(RESOLUTION_320x240,
            DEPTH_16_BPP,
@@ -44,23 +47,30 @@ int main(void) {
 
     while(!(disp = display_lock()));
 
-    // Fill the screen
-    graphics_fill_screen(disp, 0x0);
+
+    // =============================
+    // Step 1: Clear the Screen
+    // =============================
+
+    // Assure RDP is ready for new commands
+    rdp_sync(SYNC_PIPE);
+    // Remove any clipping windows
+    rdp_set_default_clipping();
+    // Attach RDP to display
+    rdp_attach_display(disp);
+    // Clear the screen with a solid color
+    rdp_enable_primitive_fill();
+    rdp_draw_filled_rectangle(0, 0, resolution_x, resolution_y);
+
+    // =============================
+    // Step 2: Draw The Tank
+    // =============================
 
     // Assure RDP is ready for new commands
     rdp_sync(SYNC_PIPE);
 
-    // Remove any clipping windows
-    rdp_set_default_clipping();
-
     // Enable sprite display instead of solid color fill
     rdp_enable_texture_copy();
-
-    // Attach RDP to display
-    rdp_attach_display(disp);
-                    
-    // Ensure the RDP is ready to receive sprites
-    rdp_sync(SYNC_PIPE);
 
     int tankWidth = redtank->width/9;
     int hSlicesPerSprite = redtank->hslices/9; // TODO
