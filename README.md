@@ -14,6 +14,11 @@ section.
 
 ## The Game
 
+<p align="left">
+  <img src="src/images/redtank64.png">
+</p>
+
+
 ### Functional Requirements
 
 1. The game is to be a 2d top-down tank shooter
