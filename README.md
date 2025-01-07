@@ -52,9 +52,29 @@ functions for hardware-accelerated graphics processing.
 
 #### Building
 
+Pull down the project:
+```
+git clone git@github.com:cheinr/tankfight64.git --recursive
+cd tankfight64
+```
+
+Build and install libdragon:
+```
+cd libdragon
+sudo -E build.sh
+cd ..
+```
+
+Build the rom:
 ```
 make
 ```
+
+That will produce `hello.z64`, which can be plopped into an N64 emulator of your choice. Recommended options are:
+
+1. [Rosalie's Mupen GUI](https://github.com/Rosalie241/RMG), which can be configured to use the GLideN64 video plugin, which is our target video plugin
+    1. For smoother rendering, set "Counter Factor" to `1` in the Core settings 
+3. [simple64](https://simple64.github.io/), which is easy to use, and pretty accurate, but does not use the GLideN64 video plugin
 
 ## Development Resources
 - https://n64squid.com/homebrew/libdragon/
