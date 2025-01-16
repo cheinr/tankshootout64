@@ -13,7 +13,7 @@ SPRITE_FILES=$(subst $(IMAGES_DIR),$(SPRITE_DIR),$(IMAGE_FILES:.png=.sprite))
 
 include $(N64_INST)/include/n64.mk
 
-all: hello.z64
+all: tankshootout64.z64
 .PHONY: all
 
 $(BUILD_DIR):
@@ -27,15 +27,15 @@ $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
 	@echo "	[MKSPRITE] Processing image" $(notdir $(subst sprite,png,$@))
 	$(TOOLS_MKSPRITE) 16 63 10 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
 
-$(BUILD_DIR)/hello.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
+$(BUILD_DIR)/tankshootout64.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 
 OBJS = $(BUILD_DIR)/main.o
 
-hello.z64: N64_ROM_TITLE="Tank64 Demo"
-hello.z64: N64_HEADERPATH=boot/libdragon/boot/bin/ipl3_compat.z64
-hello.z64: $(SPRITE_FILES) $(BUILD_DIR)/hello.dfs
+tankshootout64.z64: N64_ROM_TITLE="Tank64 Demo"
+tankshootout64.z64: N64_HEADERPATH=boot/libdragon/boot/bin/ipl3_compat.z64
+tankshootout64.z64: $(SPRITE_FILES) $(BUILD_DIR)/tankshootout64.dfs
 
-$(BUILD_DIR)/hello.elf: $(OBJS)
+$(BUILD_DIR)/tankshootout64.elf: $(OBJS)
 
 clean:
 	rm -rf $(BUILD_DIR)
