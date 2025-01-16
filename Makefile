@@ -27,11 +27,12 @@ $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
 	@echo "	[MKSPRITE] Processing image" $(notdir $(subst sprite,png,$@))
 	$(TOOLS_MKSPRITE) 16 63 10 $(IMAGES_DIR)/$(notdir $(subst sprite,png,$@)) $@
 
-$(BUILD_DIR)/hello.dfs: $(SPRITE_FILES) $(wildcard $(SOURCE_DIR)/filesystem/*)
+$(BUILD_DIR)/hello.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 
 OBJS = $(BUILD_DIR)/main.o
 
 hello.z64: N64_ROM_TITLE="Tank64 Demo"
+hello.z64: N64_HEADERPATH=boot/libdragon/boot/bin/ipl3_compat.z64
 hello.z64: $(SPRITE_FILES) $(BUILD_DIR)/hello.dfs
 
 $(BUILD_DIR)/hello.elf: $(OBJS)
