@@ -24,7 +24,7 @@ section.
 1. The game is to be a 2d top-down tank shooter
 2. It will initially support 4 players
 3. Players will be able to move and rotate their tank with the analog stick
-4. Players will be able to fire projectiles from their tank that can destroy other player's tanks
+4. Players will be able to fire projectiles from their tank that can destroy other players' tanks
 5. There will be collision detection to prevent tanks from overlapping
  
 ### Deliberate Functional Constraints
@@ -59,8 +59,8 @@ functions for hardware-accelerated graphics processing.
 
 Pull down the project:
 ```
-git clone git@github.com:cheinr/tankfight64.git --recursive
-cd tankfight64
+git clone git@github.com:cheinr/tankshootout64.git --recursive
+cd tankshootout64
 ```
 
 Build and install libdragon:
@@ -75,7 +75,7 @@ Build the rom:
 make
 ```
 
-That will produce `hello.z64`, which can be plopped into an N64 emulator of your choice. Recommended options are:
+That will produce `tankshootout64.z64` and `tankshootout64.emu-compat.z64`, which can be plopped into an N64 emulator of your choice (use the latter ROM for inaccurate emulators). Recommended options are:
 
 1. [Rosalie's Mupen GUI](https://github.com/Rosalie241/RMG), which can be configured to use the GLideN64 video plugin, which is our target video plugin
     1. For smoother rendering, set "Counter Factor" to `1` in the Core settings 
