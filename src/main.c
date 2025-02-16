@@ -3,6 +3,8 @@
 
 #include <libdragon.h>
 
+#include "tank.h"
+
 static volatile uint32_t animcounter = 0;
 
 
@@ -32,15 +34,8 @@ int main(void) {
 
   // Allows debugf statements to show up in emulator logs
   debug_init_isviewer();
-  
-  // Get the file handle for our sprite
-  int fp = dfs_open("/redtank98.sprite");
-  // Allocate a buffer for our file
-  sprite_t *redtank = malloc(dfs_size(fp));
-  // Load the sprite into the buffer
-  dfs_read(redtank, 1, dfs_size(fp), fp);
-  // Reading is complete, close the file
-  dfs_close(fp);
+
+  tank_t* tank1 = tank_init(20, 30);
 
   /* Kick off animation update timer to fire thirty times a second */
   new_timer(TIMER_TICKS(1000000 / 30), TF_CONTINUOUS, update_counter);
@@ -53,6 +48,7 @@ int main(void) {
     while(!(disp = display_lock()));
 
 
+    tank_tick(tank1, animcounter);
     // =============================
     // Step 1: Clear the Screen
     // =============================
@@ -77,38 +73,7 @@ int main(void) {
     // Enable sprite display instead of solid color fill
     rdp_enable_texture_copy();
 
-    int tankWidth = redtank->width/9;
-    int hSlicesPerSprite = redtank->hslices/9; // TODO
-    int degrees = (animcounter<<1) % 360;
-
-    int spriteStart = (degrees % 90) * hSlicesPerSprite;
-    int reverseDrawOrder = 0;
-    int mirror;
-    if (degrees < 90) {
-      mirror = MIRROR_DISABLED;
-    } else if (degrees < 180) {
-      spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
-      reverseDrawOrder = 1;
-      mirror = MIRROR_X;
-    } else if (degrees < 270) {
-      mirror = MIRROR_XY;
-      reverseDrawOrder = 1;
-    } else {
-      spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
-      mirror = MIRROR_Y;
-    }
-
-    int i;
-    for (i = 0; i < hSlicesPerSprite; i++) {
-
-      int stride = reverseDrawOrder
-        ? spriteStart + (hSlicesPerSprite - i - 1)
-        : spriteStart + i;
-
-      rdp_sync(SYNC_PIPE);
-      rdp_load_texture_stride(0, 0, mirror, redtank, stride);
-      rdp_draw_sprite(0, 20 + ((tankWidth/hSlicesPerSprite)*i), 50, mirror);
-    }
+    tank_draw(tank1);
 
     rdp_detach_display();
 

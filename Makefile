@@ -35,7 +35,8 @@ $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
 $(BUILD_DIR)/tankshootout64.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 $(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 
-OBJS = $(BUILD_DIR)/main.o
+OBJS = $(BUILD_DIR)/main.o \
+	$(BUILD_DIR)/tank.o
 
 tankshootout64.z64: N64_ROM_TITLE=$(ROM_TITLE)
 tankshootout64.z64: N64_HEADERPATH=boot/ipl3_compat.z64
