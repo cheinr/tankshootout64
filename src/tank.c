@@ -6,6 +6,15 @@
 
 #define PI 3.14159
 
+#define TANK_CENTER_OFFSET 37
+#define TANK_SPRITE_TRIMMED_PIXELS_LEFT 10
+#define TANK_SPRITE_TRIMMED_PIXELS_TOP 10
+
+#define TANK_MIN_X 0.0 + TANK_CENTER_OFFSET
+#define TANK_MAX_X 320.0 - TANK_CENTER_OFFSET
+#define TANK_MIN_Y 0.0 + TANK_CENTER_OFFSET
+#define TANK_MAX_Y 240.0 - TANK_CENTER_OFFSET
+
 tank_t *tank_init(float xPosition, float yPosition) {
 
   tank_t *tank = malloc(sizeof(tank_t));
@@ -49,14 +58,14 @@ void tank_draw(tank_t *tank) {
   int mirror;
   if (degrees < 90) {
     mirror = MIRROR_DISABLED;
-    shiftX = 10;
-    shiftY = 10;
+    shiftX = TANK_SPRITE_TRIMMED_PIXELS_LEFT;
+    shiftY = TANK_SPRITE_TRIMMED_PIXELS_TOP;
   } else if (degrees < 180) {
     spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
     reverseDrawOrder = 1;
     mirror = MIRROR_X;
     shiftX = 0;
-    shiftY = 10;
+    shiftY = TANK_SPRITE_TRIMMED_PIXELS_TOP;
   } else if (degrees < 270) {
     mirror = MIRROR_XY;
     reverseDrawOrder = 1;
@@ -65,7 +74,7 @@ void tank_draw(tank_t *tank) {
   } else {
     spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
     mirror = MIRROR_Y;
-    shiftX = 10;
+    shiftX = TANK_SPRITE_TRIMMED_PIXELS_LEFT;
     shiftY = 0;
   }
 
@@ -82,7 +91,7 @@ void tank_draw(tank_t *tank) {
     int x = (int) tank->x;
     int y = (int) tank->y;
 
-    rdp_draw_sprite(0, x + ((tankWidth/hSlicesPerSprite)*i) + shiftX, y + shiftY, mirror);
+    rdp_draw_sprite(0, x + ((tankWidth/hSlicesPerSprite)*i) + shiftX - TANK_CENTER_OFFSET, y + shiftY - TANK_CENTER_OFFSET, mirror);
 
   }
 }
@@ -105,6 +114,6 @@ void tank_tick(tank_t *tank, uint32_t animCounter, const struct SI_condat *gamep
   float dx = cos(rotationRadians) * speed;
   float dy = sin(rotationRadians) * speed;
 
-  tank->x += dx;
-  tank->y += dy;
+  tank->x = fmaxf(fminf(tank->x + dx, TANK_MAX_X), TANK_MIN_X);
+  tank->y = fmaxf(fminf(tank->y + dy, TANK_MAX_Y), TANK_MIN_Y);
 }
