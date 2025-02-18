@@ -48,13 +48,15 @@ int main(void) {
   /* Main loop test */
   while (1) {
 
+    controller_scan();
+    const SI_controllers_state_t controllers = get_keys_pressed();
+
+    tank_tick(tank1, animcounter, &controllers.c[0]);
+    tank_tick(tank2, animcounter, &controllers.c[1]);
+    tank_tick(tank3, animcounter, &controllers.c[2]);
+    tank_tick(tank4, animcounter, &controllers.c[3]);
+
     while(!(disp = display_lock()));
-
-
-    tank_tick(tank1, animcounter);
-    tank_tick(tank2, animcounter);
-    tank_tick(tank3, animcounter);
-    tank_tick(tank4, animcounter);
 
     // =============================
     // Step 1: Clear the Screen

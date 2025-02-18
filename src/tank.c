@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <libdragon.h>
+#include <math.h>
 
 #include "tank.h"
+
+#define PI 3.14159
 
 tank_t *tank_init(float xPosition, float yPosition) {
 
@@ -38,8 +41,6 @@ void tank_draw(tank_t *tank) {
   int hSlicesPerSprite = tank->sprite->hslices/9; // TODO
   int degrees = tank->rotationDegrees;
 
-  debugf("hslicesPerSprite: %d\n", hSlicesPerSprite);
-
   int spriteStart = (degrees % 90) * hSlicesPerSprite;
   int reverseDrawOrder = 0;
 
@@ -75,8 +76,7 @@ void tank_draw(tank_t *tank) {
       ? spriteStart + (hSlicesPerSprite - i - 1)
       : spriteStart + i;
 
-    int bytes = rdp_load_texture_stride(0, 0, mirror, tank->sprite, stride);
-    debugf("bytes: %u\n", bytes);
+    rdp_load_texture_stride(0, 0, mirror, tank->sprite, stride);
 
     rdp_sync(SYNC_PIPE);
     int x = (int) tank->x;
@@ -87,6 +87,24 @@ void tank_draw(tank_t *tank) {
   }
 }
 
-void tank_tick(tank_t *tank, uint32_t animCounter) {
-  tank->rotationDegrees = (animCounter<<1) % 360;
+void tank_tick(tank_t *tank, uint32_t animCounter, const struct SI_condat *gamepad) {
+
+  int rotationAdjustment = gamepad->x/10;
+
+  if (rotationAdjustment < 0) {
+    int result = tank->rotationDegrees + rotationAdjustment;
+    tank->rotationDegrees = (result < 0) ? 360 + result : result;
+  } else {
+    tank->rotationDegrees = (tank->rotationDegrees + rotationAdjustment) % 360;
+  }
+
+  int speed = gamepad->y/10;
+
+  double rotationRadians = tank->rotationDegrees * (PI/180.0);
+
+  float dx = cos(rotationRadians) * speed;
+  float dy = sin(rotationRadians) * speed;
+
+  tank->x += dx;
+  tank->y += dy;
 }

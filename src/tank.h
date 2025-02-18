@@ -1,6 +1,8 @@
 #ifndef __TANK_H
 #define __TANK_H
 
+#include <libdragon.h>
+
 typedef struct tank_s {
   sprite_t *sprite;
   int xSlices;
@@ -16,6 +18,6 @@ typedef struct tank_s {
 tank_t *tank_init(float xPosition, float yPosition);
 void tank_free(tank_t *tank);
 void tank_draw(tank_t *tank);
-void tank_tick(tank_t *tank, uint32_t animCounter);
+void tank_tick(tank_t *tank, uint32_t animCounter, const struct SI_condat *gamepad);
 
 #endif
