@@ -8,7 +8,7 @@ tank_t *tank_init(float xPosition, float yPosition) {
   tank_t *tank = malloc(sizeof(tank_t));
 
   // Get the file handle for our sprite
-  int fp = dfs_open("/redtank98.sprite");
+  int fp = dfs_open("/redtank64shifted10.sprite");
   // Allocate a buffer for our file
   sprite_t *redtank = malloc(dfs_size(fp));
 
@@ -43,19 +43,29 @@ void tank_draw(tank_t *tank) {
   int spriteStart = (degrees % 90) * hSlicesPerSprite;
   int reverseDrawOrder = 0;
 
+  int shiftX;
+  int shiftY;
   int mirror;
   if (degrees < 90) {
     mirror = MIRROR_DISABLED;
+    shiftX = 10;
+    shiftY = 10;
   } else if (degrees < 180) {
     spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
     reverseDrawOrder = 1;
     mirror = MIRROR_X;
+    shiftX = 0;
+    shiftY = 10;
   } else if (degrees < 270) {
     mirror = MIRROR_XY;
     reverseDrawOrder = 1;
+    shiftX = 0;
+    shiftY = 0;
   } else {
     spriteStart = (90 - (degrees % 90) - 1) * hSlicesPerSprite;
     mirror = MIRROR_Y;
+    shiftX = 10;
+    shiftY = 0;
   }
 
   int i;
@@ -72,10 +82,9 @@ void tank_draw(tank_t *tank) {
     int x = (int) tank->x;
     int y = (int) tank->y;
 
-    rdp_draw_sprite(0, x + ((tankWidth/hSlicesPerSprite)*i), y, mirror);
+    rdp_draw_sprite(0, x + ((tankWidth/hSlicesPerSprite)*i) + shiftX, y + shiftY, mirror);
 
   }
-
 }
 
 void tank_tick(tank_t *tank, uint32_t animCounter) {

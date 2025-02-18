@@ -36,6 +36,9 @@ int main(void) {
   debug_init_isviewer();
 
   tank_t* tank1 = tank_init(20, 30);
+  tank_t* tank2 = tank_init(120, 30);
+  tank_t* tank3 = tank_init(20, 130);
+  tank_t* tank4 = tank_init(120, 130);
 
   /* Kick off animation update timer to fire thirty times a second */
   new_timer(TIMER_TICKS(1000000 / 30), TF_CONTINUOUS, update_counter);
@@ -49,6 +52,10 @@ int main(void) {
 
 
     tank_tick(tank1, animcounter);
+    tank_tick(tank2, animcounter);
+    tank_tick(tank3, animcounter);
+    tank_tick(tank4, animcounter);
+
     // =============================
     // Step 1: Clear the Screen
     // =============================
@@ -61,6 +68,7 @@ int main(void) {
     rdp_attach_display(disp);
     // Clear the screen with a solid color
     rdp_enable_primitive_fill();
+    rdp_set_primitive_color(graphics_make_color(50, 168, 82, 255));
     rdp_draw_filled_rectangle(0, 0, resolution_x, resolution_y);
 
     // =============================
@@ -74,6 +82,9 @@ int main(void) {
     rdp_enable_texture_copy();
 
     tank_draw(tank1);
+    tank_draw(tank2);
+    tank_draw(tank3);
+    tank_draw(tank4);
 
     rdp_detach_display();
 
