@@ -4,7 +4,6 @@
 
 #include "tank.h"
 
-#define PI 3.14159
 
 #define ADJUSTED_TANK_SPRITE_SIZE 74
 #define TANK_SPRITE_TRIMMED_PIXELS_TOP_LEFT 10
@@ -18,7 +17,7 @@
 #define TANK_MIN_Y 0.0 + (TANK_BODY_SIZE/2)
 #define TANK_MAX_Y 240.0 - (TANK_BODY_SIZE/2)
 
-tank_t *tank_init(float xPosition, float yPosition) {
+tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
@@ -33,11 +32,14 @@ tank_t *tank_init(float xPosition, float yPosition) {
   dfs_close(fp);
 
   tank->sprite = redtank;
-  tank->x = xPosition;
-  tank->y = yPosition;
-  tank->rotationDegrees = 0;
-  tank->dx = 0;
-  tank->dy = 0;
+
+  tank->physicsEntity.entityId = entityId;
+  tank->physicsEntity.position.x = xPosition;
+  tank->physicsEntity.position.y = yPosition;
+  tank->physicsEntity.radius = TANK_BODY_SIZE / 2.0;
+  tank->physicsEntity.rotation = 0.0;
+  tank->physicsEntity.rotationDelta = 0.0;
+  tank->physicsEntity.speed = 0.0;
 
   return tank;
 }
@@ -51,7 +53,7 @@ void tank_draw(tank_t *tank) {
 
   int tankWidth = tank->sprite->width/9;
   int hSlicesPerSprite = tank->sprite->hslices/9; // TODO
-  int degrees = tank->rotationDegrees;
+  int degrees = (int) tank->physicsEntity.rotation;
 
   int spriteStart = (degrees % 90) * hSlicesPerSprite;
   int reverseDrawOrder = 0;
@@ -91,8 +93,8 @@ void tank_draw(tank_t *tank) {
     rdp_load_texture_stride(0, 0, mirror, tank->sprite, stride);
 
     rdp_sync(SYNC_PIPE);
-    int x = (int) tank->x;
-    int y = (int) tank->y;
+    int x = (int) tank->physicsEntity.position.x;
+    int y = (int) tank->physicsEntity.position.y;
 
     rdp_draw_sprite(0, x + ((tankWidth/hSlicesPerSprite)*i) + shiftX - TANK_SPRITE_CENTER_OFFSET, y + shiftY - TANK_SPRITE_CENTER_OFFSET, mirror);
 
@@ -102,21 +104,8 @@ void tank_draw(tank_t *tank) {
 void tank_tick(tank_t *tank, uint32_t animCounter, const struct SI_condat *gamepad) {
 
   int rotationAdjustment = gamepad->x/10;
-
-  if (rotationAdjustment < 0) {
-    int result = tank->rotationDegrees + rotationAdjustment;
-    tank->rotationDegrees = (result < 0) ? 360 + result : result;
-  } else {
-    tank->rotationDegrees = (tank->rotationDegrees + rotationAdjustment) % 360;
-  }
-
   int speed = gamepad->y/10;
 
-  double rotationRadians = tank->rotationDegrees * (PI/180.0);
-
-  float dx = cos(rotationRadians) * speed;
-  float dy = sin(rotationRadians) * speed;
-
-  tank->x = fmaxf(fminf(tank->x + dx, TANK_MAX_X), TANK_MIN_X);
-  tank->y = fmaxf(fminf(tank->y + dy, TANK_MAX_Y), TANK_MIN_Y);
+  tank->physicsEntity.rotationDelta = rotationAdjustment;
+  tank->physicsEntity.speed = speed;
 }

@@ -36,6 +36,7 @@ $(BUILD_DIR)/tankshootout64.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesys
 $(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 
 OBJS = $(BUILD_DIR)/main.o \
+	$(BUILD_DIR)/physics.o \
 	$(BUILD_DIR)/tank.o
 
 tankshootout64.z64: N64_ROM_TITLE=$(ROM_TITLE)

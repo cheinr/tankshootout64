@@ -4,9 +4,11 @@
 #include <libdragon.h>
 
 #include "tank.h"
+#include "physics.h"
 
 static volatile uint32_t animcounter = 0;
 
+uint32_t entityIdCounter = 0;
 
 void update_counter( int ovfl )
 {
@@ -32,13 +34,21 @@ int main(void) {
   controller_init();
   timer_init();
 
+  // world coordinates happen to be the same as screen coordinates
+  physics_scene_init(resolution_x, resolution_y);
+
   // Allows debugf statements to show up in emulator logs
   debug_init_isviewer();
 
-  tank_t* tank1 = tank_init(20, 30);
-  tank_t* tank2 = tank_init(120, 30);
-  tank_t* tank3 = tank_init(20, 130);
-  tank_t* tank4 = tank_init(120, 130);
+  tank_t* tank1 = tank_init(entityIdCounter++, 20, 30);
+  tank_t* tank2 = tank_init(entityIdCounter++, 120, 30);
+  tank_t* tank3 = tank_init(entityIdCounter++, 20, 130);
+  tank_t* tank4 = tank_init(entityIdCounter++, 120, 130);
+
+  physics_scene_add_entity(&tank1->physicsEntity);
+  physics_scene_add_entity(&tank2->physicsEntity);
+  physics_scene_add_entity(&tank3->physicsEntity);
+  physics_scene_add_entity(&tank4->physicsEntity);
 
   /* Kick off animation update timer to fire thirty times a second */
   new_timer(TIMER_TICKS(1000000 / 30), TF_CONTINUOUS, update_counter);
@@ -55,6 +65,8 @@ int main(void) {
     tank_tick(tank2, animcounter, &controllers.c[1]);
     tank_tick(tank3, animcounter, &controllers.c[2]);
     tank_tick(tank4, animcounter, &controllers.c[3]);
+
+    physics_scene_tick();
 
     while(!(disp = display_lock()));
 
