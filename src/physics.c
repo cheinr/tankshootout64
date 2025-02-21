@@ -42,51 +42,110 @@ void physics_scene_remove_entity() {
   // TODO
 }
 
+
+static int do_entities_collide(struct physics_entity* ours, struct physics_entity* other) {
+  return ((ours->position.x - ours->radius <= other->position.x + other->radius)
+      && (ours->position.x + ours->radius >= other->position.x - other->radius)
+      && (ours->position.y - ours->radius <= other->position.y + other->radius)
+      && (ours->position.y + ours->radius >= other->position.y - other->radius));
+}
+
 #define PI 3.14159
 
-static void update_entity_positions() {
+static void handle_collision(struct physics_entity* ours, struct physics_entity* other) {
+  //debugf("handling collision between %lu and %lu!\n", ours->entityId, other->entityId);
+
+  float differenceX = ours->position.x - other->position.x;
+  float differenceY = ours->position.y - other->position.y;
+
+  float ourIntersectionX = (differenceX < 0)
+    ? (ours->position.x + ours->radius)
+    : (ours->position.x - ours->radius);
+
+  float ourIntersectionY = (differenceY < 0)
+    ? (ours->position.y + ours->radius)
+    : (ours->position.y - ours->radius);
+
+  float otherIntersectionX = (differenceX < 0)
+    ? (other->position.x - other->radius)
+    : (other->position.x + other->radius);
+
+  float otherIntersectionY = (differenceY < 0)
+    ? (other->position.y - other->radius)
+    : (other->position.y + other->radius);
+
+  float overlapX = ourIntersectionX - otherIntersectionX;
+  float overlapY = ourIntersectionY - otherIntersectionY;
+
+  if (abs(overlapX) < abs(overlapY)) {
+    ours->position.x -= overlapX;
+  } else {
+    ours->position.y -= overlapY;
+  }
+
+  double ourRotationRadians = ours->rotation * (PI/180.0);
+  float ourDx = cos(ourRotationRadians) * ours->speed;
+  float ourDy = sin(ourRotationRadians) * ours->speed;
+
+  other->movementModifier.x = -((ourDx - ours->movementModifier.x) * (1/other->weight));
+  other->movementModifier.y = -((ourDy - ours->movementModifier.y) * (1/other->weight));
+}
+
+static void update_entity_position(struct physics_entity* physicsEntity) {
+  double rotationRadians = physicsEntity->rotation * (PI/180.0);
+  float dx = cos(rotationRadians) * physicsEntity->speed;
+  float dy = sin(rotationRadians) * physicsEntity->speed;
+
+  float newX = physicsEntity->position.x + dx - physicsEntity->movementModifier.x;
+  float newY = physicsEntity->position.y + dy - physicsEntity->movementModifier.y;
+
+  if (newX + physicsEntity->radius >= g_physicsScene.sceneWidth) {
+    newX = g_physicsScene.sceneWidth - 1 - physicsEntity->radius;
+  } else if (newX - physicsEntity->radius < 0) {
+    newX = 0 + physicsEntity->radius;
+  }
+
+  if (newY + physicsEntity->radius >= g_physicsScene.sceneHeight) {
+    newY = g_physicsScene.sceneHeight - 1 - physicsEntity->radius;
+  } else if (newY - physicsEntity->radius < 0) {
+    newY = 0 + physicsEntity->radius;
+  }
+
+  physicsEntity->position.x = newX;
+  physicsEntity->position.y = newY;
+
+  float adjustedRotation = physicsEntity->rotation + physicsEntity->rotationDelta;
+  physicsEntity->rotation = (adjustedRotation < 0)
+    ? 360.0 + physicsEntity->rotationDelta
+    : fmod(adjustedRotation, 360.0);
+
+}
+
+static void entities_tick() {
   for (int i = 0; i < g_physicsScene.physicsEntityCount; i++) {
+
     struct physics_entity* physicsEntity = g_physicsScene.physicsEntities[i];
 
-    double rotationRadians = physicsEntity->rotation * (PI/180.0);
-    float dx = cos(rotationRadians) * physicsEntity->speed;
-    float dy = sin(rotationRadians) * physicsEntity->speed;
-    
-    float newX = physicsEntity->position.x + dx;
-    float newY = physicsEntity->position.y + dy;
+    update_entity_position(physicsEntity);
 
-    if (newX + physicsEntity->radius >= g_physicsScene.sceneWidth) {
-      newX = g_physicsScene.sceneWidth - 1 - physicsEntity->radius;
-    } else if (newX - physicsEntity->radius < 0) {
-      newX = 0 + physicsEntity->radius;
+    for (int j = 0; j < g_physicsScene.physicsEntityCount; j++) {
+      if (i == j) {
+        continue;
+      }
+
+      struct physics_entity* other = g_physicsScene.physicsEntities[j];
+
+      if (do_entities_collide(physicsEntity, other)) {
+        handle_collision(physicsEntity, other);
+      }
     }
 
-    if (newY + physicsEntity->radius >= g_physicsScene.sceneHeight) {
-      newY = g_physicsScene.sceneHeight - 1 - physicsEntity->radius;
-    } else if (newY - physicsEntity->radius < 0) {
-      newY = 0 + physicsEntity->radius;
-    }
-
-    physicsEntity->position.x = newX;
-    physicsEntity->position.y = newY;
-
-    float adjustedRotation = physicsEntity->rotation + physicsEntity->rotationDelta;
-    physicsEntity->rotation = (adjustedRotation < 0)
-      ? 360.0 + physicsEntity->rotationDelta
-      : fmod(adjustedRotation, 360.0);
-
+    physicsEntity->movementModifier.x = 0;
+    physicsEntity->movementModifier.y = 0;
   }
 }
 
-static void handle_entity_collisions() {
-  // TODO
-}
-
-
 // TODO - should account for time delta between ticks
 void physics_scene_tick() {
-
-  update_entity_positions();
-
-  handle_entity_collisions();
+  entities_tick();
 }

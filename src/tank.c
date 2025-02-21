@@ -40,6 +40,7 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
   tank->physicsEntity.rotation = 0.0;
   tank->physicsEntity.rotationDelta = 0.0;
   tank->physicsEntity.speed = 0.0;
+  tank->physicsEntity.weight = 10.0;
 
   return tank;
 }
