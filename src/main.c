@@ -95,10 +95,15 @@ int main(void) {
     // Enable sprite display instead of solid color fill
     rdp_enable_texture_copy();
 
-    tank_draw(tank1);
-    tank_draw(tank2);
-    tank_draw(tank3);
-    tank_draw(tank4);
+    tank_draw_body(tank1);
+    tank_draw_body(tank2);
+    tank_draw_body(tank3);
+    tank_draw_body(tank4);
+
+    tank_draw_barrel(tank1);
+    tank_draw_barrel(tank2);
+    tank_draw_barrel(tank3);
+    tank_draw_barrel(tank4);
 
     rdp_detach_display();
 
