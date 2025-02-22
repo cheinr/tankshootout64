@@ -46,7 +46,8 @@ $(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(TANK_BODY_SPRITE_FILES) $(TANK_BAR
 
 OBJS = $(BUILD_DIR)/main.o \
 	$(BUILD_DIR)/physics.o \
-	$(BUILD_DIR)/tank.o
+	$(BUILD_DIR)/tank.o \
+	$(BUILD_DIR)/fps.o
 
 tankshootout64.z64: N64_ROM_TITLE=$(ROM_TITLE)
 tankshootout64.z64: N64_HEADERPATH=boot/ipl3_compat.z64

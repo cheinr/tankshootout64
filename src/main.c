@@ -5,6 +5,7 @@
 
 #include "tank.h"
 #include "physics.h"
+#include "fps.h"
 
 uint32_t entityIdCounter = 0;
 
@@ -25,6 +26,7 @@ int main(void) {
   dfs_init(DFS_DEFAULT_LOCATION);
   rdp_init();
   controller_init();
+  timer_init();
 
   // world coordinates happen to be the same as screen coordinates
   physics_scene_init(resolution_x, resolution_y);
@@ -46,6 +48,8 @@ int main(void) {
   
   /* Main loop test */
   while (1) {
+
+    fps_tick();
 
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();
@@ -78,9 +82,6 @@ int main(void) {
     // Step 2: Draw The Tank
     // =============================
 
-    // Assure RDP is ready for new commands
-    rdp_sync(SYNC_PIPE);
-
     // Enable sprite display instead of solid color fill
     rdp_enable_texture_copy();
 
@@ -95,6 +96,8 @@ int main(void) {
     tank_draw_barrel(tank4);
 
     rdp_detach_display();
+
+    fps_draw(&disp);
 
     display_show(disp);
   }
