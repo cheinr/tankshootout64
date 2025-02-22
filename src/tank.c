@@ -127,7 +127,7 @@ void tank_draw_barrel(tank_t *tank) {
 
 
 
-void tank_tick(tank_t *tank, uint32_t animCounter, const struct SI_condat *gamepad) {
+void tank_tick(tank_t *tank, const struct SI_condat *gamepad) {
 
   int rotationAdjustment = gamepad->x/10;
   int speed = gamepad->y/10;

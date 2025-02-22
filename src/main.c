@@ -6,14 +6,7 @@
 #include "tank.h"
 #include "physics.h"
 
-static volatile uint32_t animcounter = 0;
-
 uint32_t entityIdCounter = 0;
-
-void update_counter( int ovfl )
-{
-    animcounter++;
-}
 
 const uint32_t DOUBLE_BUFFERING = 2;
 
@@ -32,7 +25,6 @@ int main(void) {
   dfs_init(DFS_DEFAULT_LOCATION);
   rdp_init();
   controller_init();
-  timer_init();
 
   // world coordinates happen to be the same as screen coordinates
   physics_scene_init(resolution_x, resolution_y);
@@ -50,9 +42,6 @@ int main(void) {
   physics_scene_add_entity(&tank3->physicsEntity);
   physics_scene_add_entity(&tank4->physicsEntity);
 
-  /* Kick off animation update timer to fire thirty times a second */
-  new_timer(TIMER_TICKS(1000000 / 30), TF_CONTINUOUS, update_counter);
-
   debugf("Starting main loop!\n");
   
   /* Main loop test */
@@ -61,10 +50,10 @@ int main(void) {
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();
 
-    tank_tick(tank1, animcounter, &controllers.c[0]);
-    tank_tick(tank2, animcounter, &controllers.c[1]);
-    tank_tick(tank3, animcounter, &controllers.c[2]);
-    tank_tick(tank4, animcounter, &controllers.c[3]);
+    tank_tick(tank1, &controllers.c[0]);
+    tank_tick(tank2, &controllers.c[1]);
+    tank_tick(tank3, &controllers.c[2]);
+    tank_tick(tank4, &controllers.c[3]);
 
     physics_scene_tick();
 
