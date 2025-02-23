@@ -8,29 +8,44 @@
 #define ADJUSTED_TANK_SPRITE_SIZE 74
 #define TANK_SPRITE_CENTER_OFFSET (ADJUSTED_TANK_SPRITE_SIZE / 2)
 
+#define TANK_BODY_SPRITE_HORIZONTAL_SLICES 2
 #define TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES 5 //(74-64)/2
+#define TANK_BARREL_SPRITE_HORIZONTAL_SLICES 1
 #define TANK_BARREL_SPRITE_TRIMMED_PIXELS_TOP_LEFT 31
 #define TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT 11
 
 #define TANK_BODY_SIZE 39
 
+static sprite_t* load_sprite(char* filepath) {
+  int fp = dfs_open(filepath);
+  sprite_t *sprite = malloc(dfs_size(fp));
+  dfs_read(sprite, 1, dfs_size(fp), fp);
+  dfs_close(fp);
+
+  return sprite;
+}
+
 tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
-  int fp = dfs_open("/redtankbody64.sprite");
-  sprite_t *redtank = malloc(dfs_size(fp));
-  dfs_read(redtank, 1, dfs_size(fp), fp);
-  dfs_close(fp);
+  for (int i = 0; i < 90; i++) {
+    char path[32];
+    sprintf(path, "/redtank_body_%04d.png-0.sprite", i+1);
 
-  tank->bodySprite = redtank;
+    tank->bodySprites[i*2] = load_sprite(path);
 
-  fp = dfs_open("/redtankbarrel32shifted31.sprite");
-  sprite_t *barrelSprite = malloc(dfs_size(fp));
-  dfs_read(barrelSprite, 1, dfs_size(fp), fp);
-  dfs_close(fp);
+    sprintf(path, "/redtank_body_%04d.png-1.sprite", i+1);
 
-  tank->barrelSprite = barrelSprite;
+    tank->bodySprites[(i*2) + 1] = load_sprite(path);
+  }
+
+  for (int i = 0; i < 90; i++) {
+    char path[32];
+    sprintf(path, "/redtank_barrel_%04d.sprite", i+1);
+
+    tank->barrelSprites[i] = load_sprite(path);
+  }
 
   tank->physicsEntity.entityId = entityId;
   tank->physicsEntity.position.x = xPosition;
@@ -45,19 +60,28 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
 }
 
 void tank_free(tank_t *tank) {
-  free(tank->bodySprite);
-  free(tank->barrelSprite);
+  for (int i = 0; i < 180; i++) {
+    free(tank->bodySprites[i]);
+  }
+  for (int i = 0; i < 90; i++) {
+    free(tank->barrelSprites[i]);
+  }
   free(tank);
 }
 
-static void tank_draw_sprite(tank_t *tank, sprite_t *sprite,
+
+static void tank_draw_sprite(tank_t *tank,
+                             sprite_t **spriteSet,
+                             uint32_t hSlicesPerSprite,
                              uint32_t spriteOffsetLeft,
                              uint32_t spriteOffsetRight,
                              uint32_t spriteOffsetTop,
                              uint32_t spriteOffsetBottom) {
 
-  int tankWidth = sprite->width/9;
-  int hSlicesPerSprite = sprite->hslices/9; // TODO
+  // All sprites in a set must be the same size; use the first one to get sprite width
+  sprite_t* firstSprite = spriteSet[0];
+  int totalSpriteWidth = firstSprite->width * hSlicesPerSprite;
+
   int degrees = (int) tank->physicsEntity.rotation;
 
   int spriteStart = (degrees % 90) * hSlicesPerSprite;
@@ -95,20 +119,24 @@ static void tank_draw_sprite(tank_t *tank, sprite_t *sprite,
       ? spriteStart + (hSlicesPerSprite - i - 1)
       : spriteStart + i;
 
-    rdp_load_texture_stride(0, 0, mirror, sprite, stride);
+    sprite_t* sprite = spriteSet[stride];
+
+    rdp_load_texture(0, 0, mirror, sprite);
 
     rdp_sync(SYNC_PIPE);
     int x = (int) tank->physicsEntity.position.x;
     int y = (int) tank->physicsEntity.position.y;
 
-    rdp_draw_sprite(0, x + shiftX + ((tankWidth/hSlicesPerSprite)*i) - TANK_SPRITE_CENTER_OFFSET, y + shiftY - TANK_SPRITE_CENTER_OFFSET, mirror);
+    rdp_draw_sprite(0, x + shiftX + ((totalSpriteWidth/hSlicesPerSprite)*i) - TANK_SPRITE_CENTER_OFFSET, y + shiftY - TANK_SPRITE_CENTER_OFFSET, mirror);
+
   }
 }
 
 void tank_draw_body(tank_t *tank) {
 
   tank_draw_sprite(tank,
-                   tank->bodySprite,
+                   tank->bodySprites,
+                   TANK_BODY_SPRITE_HORIZONTAL_SLICES,
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES,
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES,
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES,
@@ -118,7 +146,8 @@ void tank_draw_body(tank_t *tank) {
 void tank_draw_barrel(tank_t *tank) {
 
   tank_draw_sprite(tank,
-                   tank->barrelSprite,
+                   tank->barrelSprites,
+                   TANK_BARREL_SPRITE_HORIZONTAL_SLICES,
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_TOP_LEFT,
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT,
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_TOP_LEFT,

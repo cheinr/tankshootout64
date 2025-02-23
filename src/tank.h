@@ -5,8 +5,12 @@
 #include "physics.h"
 
 typedef struct tank_s {
-  sprite_t *bodySprite;
-  sprite_t *barrelSprite;
+  // Loading sprites individually seems to be way faster
+  // than relying on rdp "_stride" functions for loading
+  // from a spritesheet. Went from ~14fps to ~60 with
+  // this change.
+  sprite_t *bodySprites[180];
+  sprite_t *barrelSprites[90];
   int xSlices;
   int ySlices;
 
