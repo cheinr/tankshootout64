@@ -30,10 +30,8 @@ $(SPRITE_DIR): $(BUILD_DIR)
 	mkdir -p $(SPRITE_DIR)
 
 $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
-	@echo "SPRITE_FILES: $(IMAGE_FILES)"
 	@echo "target: $@"
 	@echo "source: $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@)))"
-	@echo "	[MKSPRITE] Processing image" $(notdir $(subst sprite,png,$@))
 	$(TOOLS_MKSPRITE) 16 1 1 $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@))) $@
 
 

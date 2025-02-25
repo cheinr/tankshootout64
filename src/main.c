@@ -51,6 +51,8 @@ int main(void) {
 
     fps_tick();
 
+    uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
+
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();
 
@@ -59,7 +61,7 @@ int main(void) {
     tank_tick(tank3, &controllers.c[2]);
     tank_tick(tank4, &controllers.c[3]);
 
-    physics_scene_tick();
+    physics_scene_tick(timeDeltaUSeconds);
 
     while(!(disp = display_lock()));
 

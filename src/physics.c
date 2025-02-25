@@ -6,6 +6,7 @@
 #include <math.h>
 
 #define EXPECTED_MAX_PHYSICS_ENTITIES 4
+#define USECONDS_PER_SECOND 1000000
 
 struct physics_scene {
   uint32_t sceneWidth;
@@ -91,13 +92,16 @@ static void handle_collision(struct physics_entity* ours, struct physics_entity*
   other->movementModifier.y = -((ourDy - ours->movementModifier.y) * (1/other->weight));
 }
 
-static void update_entity_position(struct physics_entity* physicsEntity) {
-  double rotationRadians = physicsEntity->rotation * (PI/180.0);
-  float dx = cos(rotationRadians) * physicsEntity->speed;
-  float dy = sin(rotationRadians) * physicsEntity->speed;
+static void update_entity_position(struct physics_entity* physicsEntity, uint32_t timeDeltaUSeconds) {
 
-  float newX = physicsEntity->position.x + dx - physicsEntity->movementModifier.x;
-  float newY = physicsEntity->position.y + dy - physicsEntity->movementModifier.y;
+  float timeDeltaSeconds = timeDeltaUSeconds / (float) USECONDS_PER_SECOND;
+
+  double rotationRadians = physicsEntity->rotation * (PI/180.0);
+  float dx = cos(rotationRadians) * physicsEntity->speed * timeDeltaSeconds;
+  float dy = sin(rotationRadians) * physicsEntity->speed * timeDeltaSeconds;
+
+  float newX = physicsEntity->position.x + dx - (physicsEntity->movementModifier.x * timeDeltaSeconds);
+  float newY = physicsEntity->position.y + dy - (physicsEntity->movementModifier.y * timeDeltaSeconds);
 
   if (newX + physicsEntity->radius >= g_physicsScene.sceneWidth) {
     newX = g_physicsScene.sceneWidth - 1 - physicsEntity->radius;
@@ -114,19 +118,18 @@ static void update_entity_position(struct physics_entity* physicsEntity) {
   physicsEntity->position.x = newX;
   physicsEntity->position.y = newY;
 
-  float adjustedRotation = physicsEntity->rotation + physicsEntity->rotationDelta;
+  float adjustedRotation = physicsEntity->rotation + (physicsEntity->rotationDelta * timeDeltaSeconds);
   physicsEntity->rotation = (adjustedRotation < 0)
-    ? 360.0 + physicsEntity->rotationDelta
+    ? 360.0 + (physicsEntity->rotationDelta * timeDeltaSeconds)
     : fmod(adjustedRotation, 360.0);
-
 }
 
-static void entities_tick() {
+static void entities_tick(uint32_t timeDeltaUSeconds) {
   for (int i = 0; i < g_physicsScene.physicsEntityCount; i++) {
 
     struct physics_entity* physicsEntity = g_physicsScene.physicsEntities[i];
 
-    update_entity_position(physicsEntity);
+    update_entity_position(physicsEntity, timeDeltaUSeconds);
 
     for (int j = 0; j < g_physicsScene.physicsEntityCount; j++) {
       if (i == j) {
@@ -145,7 +148,6 @@ static void entities_tick() {
   }
 }
 
-// TODO - should account for time delta between ticks
-void physics_scene_tick() {
-  entities_tick();
+void physics_scene_tick(uint32_t timeDeltaUSeconds) {
+  entities_tick(timeDeltaUSeconds);
 }

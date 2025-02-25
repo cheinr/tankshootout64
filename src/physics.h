@@ -24,7 +24,7 @@ struct physics_entity {
 void physics_scene_init(int worldWidth, int worldHeight);
 void physics_scene_add_entity(struct physics_entity* physicsEntity);
 void physics_scene_remove_entity();
-void physics_scene_tick();
+void physics_scene_tick(uint32_t timeDeltaUSeconds);
 
 
 #endif

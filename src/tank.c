@@ -158,8 +158,8 @@ void tank_draw_barrel(tank_t *tank) {
 
 void tank_tick(tank_t *tank, const struct SI_condat *gamepad) {
 
-  int rotationAdjustment = gamepad->x/10;
-  int speed = gamepad->y/10;
+  int rotationAdjustment = (gamepad->x/85.0) * 90;
+  int speed = (gamepad->y/85.0) * 50;
 
   tank->physicsEntity.rotationDelta = rotationAdjustment;
   tank->physicsEntity.speed = speed;

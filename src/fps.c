@@ -1,4 +1,5 @@
 #include <libdragon.h>
+#include <assert.h>
 
 uint32_t frameCount = 0;
 uint32_t lastFrameTimeUSeconds = 0;
@@ -22,6 +23,10 @@ void fps_tick() {
   lastFrameTimeUSeconds = frameTimeUSeconds;
 }
 
+uint32_t fps_get_tick_delta_useconds() {
+  assert(numFrameTimeSamples > 0);
+  return frameTimeUSecondsSamples[numFrameTimeSamples - 1];
+}
 
 static float calculate_average_fps() {
   uint32_t totalSampleTime = 0;
