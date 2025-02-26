@@ -34,10 +34,10 @@ int main(void) {
   // Allows debugf statements to show up in emulator logs
   debug_init_isviewer();
 
-  tank_t* tank1 = tank_init(entityIdCounter++, 20, 30);
-  tank_t* tank2 = tank_init(entityIdCounter++, 120, 30);
-  tank_t* tank3 = tank_init(entityIdCounter++, 20, 130);
-  tank_t* tank4 = tank_init(entityIdCounter++, 120, 130);
+  tank_t* tank1 = tank_init(entityIdCounter++, 32, 32, 45);
+  tank_t* tank2 = tank_init(entityIdCounter++, resolution_x - 32, 32, 135);
+  tank_t* tank3 = tank_init(entityIdCounter++, 32, resolution_y - 32, 315);
+  tank_t* tank4 = tank_init(entityIdCounter++, resolution_x - 32, resolution_y - 32, 225);
 
   physics_scene_add_entity(&tank1->physicsEntity);
   physics_scene_add_entity(&tank2->physicsEntity);

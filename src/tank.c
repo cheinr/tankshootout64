@@ -25,7 +25,7 @@ static sprite_t* load_sprite(char* filepath) {
   return sprite;
 }
 
-tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
+tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
@@ -51,7 +51,7 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition) {
   tank->physicsEntity.position.x = xPosition;
   tank->physicsEntity.position.y = yPosition;
   tank->physicsEntity.radius = TANK_BODY_SIZE / 2.0;
-  tank->physicsEntity.rotation = 0.0;
+  tank->physicsEntity.rotation = rotationDegrees;
   tank->physicsEntity.rotationDelta = 0.0;
   tank->physicsEntity.speed = 0.0;
   tank->physicsEntity.weight = 10.0;

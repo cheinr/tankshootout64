@@ -17,7 +17,7 @@ typedef struct tank_s {
   struct physics_entity physicsEntity;
 } tank_t;
 
-tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition);
+tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees);
 void tank_free(tank_t *tank);
 void tank_draw_body(tank_t *tank);
 void tank_draw_barrel(tank_t *tank);
