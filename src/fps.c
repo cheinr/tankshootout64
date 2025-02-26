@@ -6,7 +6,7 @@ uint32_t lastFrameTimeUSeconds = 0;
 uint32_t frameTimeUSecondsSamples[10];
 uint32_t numFrameTimeSamples = 0;
 
-uint32_t upPressed = 0;
+uint32_t cUpPressed = 0;
 uint32_t drawFPS = 0;
 
 void fps_tick(const struct SI_condat *gamepad) {
@@ -25,11 +25,11 @@ void fps_tick(const struct SI_condat *gamepad) {
 
   lastFrameTimeUSeconds = frameTimeUSeconds;
 
-  if (!upPressed && gamepad->up) {
+  if (!cUpPressed && gamepad->C_up) {
     drawFPS = !drawFPS;
   }
 
-  upPressed = gamepad->up;
+  cUpPressed = gamepad->C_up;
 }
 
 uint32_t fps_get_tick_delta_useconds() {
