@@ -6,7 +6,10 @@ uint32_t lastFrameTimeUSeconds = 0;
 uint32_t frameTimeUSecondsSamples[10];
 uint32_t numFrameTimeSamples = 0;
 
-void fps_tick() {
+uint32_t upPressed = 0;
+uint32_t drawFPS = 0;
+
+void fps_tick(const struct SI_condat *gamepad) {
   frameCount++;
   uint32_t timerTicks = timer_ticks();
   uint64_t frameTimeUSeconds = TIMER_MICROS_LL(timerTicks);
@@ -21,6 +24,12 @@ void fps_tick() {
   frameTimeUSecondsSamples[numFrameTimeSamples++] = frameTimeUSeconds - lastFrameTimeUSeconds;
 
   lastFrameTimeUSeconds = frameTimeUSeconds;
+
+  if (!upPressed && gamepad->up) {
+    drawFPS = !drawFPS;
+  }
+
+  upPressed = gamepad->up;
 }
 
 uint32_t fps_get_tick_delta_useconds() {
@@ -41,6 +50,11 @@ static float calculate_average_fps() {
 }
 
 void fps_draw(display_context_t* disp) {
+
+  if (!drawFPS) {
+    return;
+  }
+
   float averageFPS = calculate_average_fps();
 
   char fpsDisplay[12];

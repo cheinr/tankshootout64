@@ -45,16 +45,16 @@ int main(void) {
   physics_scene_add_entity(&tank4->physicsEntity);
 
   debugf("Starting main loop!\n");
-  
+
   /* Main loop test */
   while (1) {
 
-    fps_tick();
-
-    uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
-
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();
+
+    fps_tick(&controllers.c[0]);
+
+    uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
 
     tank_tick(tank1, &controllers.c[0]);
     tank_tick(tank2, &controllers.c[1]);
