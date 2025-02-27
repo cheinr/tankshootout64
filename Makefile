@@ -8,7 +8,7 @@ TOOLS_MKSPRITE=$(N64_INST)/bin/mksprite
 IMAGES_DIR=$(SOURCE_DIR)/images
 IMAGE_FILES=$(wildcard $(IMAGES_DIR)/*.png)
 
-IMAGE_FILES=$(wildcard $(IMAGES_DIR)/*tank/*/*.png)
+IMAGE_FILES=$(wildcard $(IMAGES_DIR)/*tank/*/*.png) $(wildcard $(IMAGES_DIR)/*.png)
 
 SPRITE_DIR=$(BUILD_DIR)/filesystem
 SPRITE_FILES=$(subst $(subst /,_,$(IMAGES_DIR)/),$(SPRITE_DIR)/,$(subst /,_,$(IMAGE_FILES:.png=.sprite)))
@@ -41,6 +41,7 @@ $(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_D
 OBJS = $(BUILD_DIR)/main.o \
 	$(BUILD_DIR)/physics.o \
 	$(BUILD_DIR)/tank.o \
+	$(BUILD_DIR)/projectile.o \
 	$(BUILD_DIR)/fps.o
 
 tankshootout64.z64: N64_ROM_TITLE=$(ROM_TITLE)

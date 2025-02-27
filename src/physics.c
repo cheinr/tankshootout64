@@ -5,7 +5,7 @@
 #include <libdragon.h>
 #include <math.h>
 
-#define EXPECTED_MAX_PHYSICS_ENTITIES 4
+#define EXPECTED_MAX_PHYSICS_ENTITIES 8
 #define USECONDS_PER_SECOND 1000000
 
 struct physics_scene {
@@ -39,8 +39,34 @@ void physics_scene_add_entity(struct physics_entity* physicsEntity) {
   g_physicsScene.physicsEntities[g_physicsScene.physicsEntityCount++] = physicsEntity;
 }
 
-void physics_scene_remove_entity() {
-  // TODO
+struct physics_entity* physics_scene_get_entity(uint32_t entityId) {
+
+  for (int i = 0; i < g_physicsScene.physicsEntityCount; i++) {
+    if (g_physicsScene.physicsEntities[i]->entityId == entityId) {
+      return g_physicsScene.physicsEntities[i];
+    }
+  }
+
+  return NULL;
+}
+
+void physics_scene_remove_entity(struct physics_entity* physicsEntity) {
+
+  int entityIndex = -1;
+  for (int i = 0; i < g_physicsScene.physicsEntityCount; i++) {
+    if (g_physicsScene.physicsEntities[i]) {
+      entityIndex = i;
+    }
+  }
+
+  if (entityIndex == -1) {
+    return;
+  }
+
+  g_physicsScene.physicsEntityCount -= 1;
+  for (int i = entityIndex; i < g_physicsScene.physicsEntityCount; i++) {
+    g_physicsScene.physicsEntities[i] = g_physicsScene.physicsEntities[i+1];
+  }
 }
 
 
@@ -55,6 +81,17 @@ static int do_entities_collide(struct physics_entity* ours, struct physics_entit
 
 static void handle_collision(struct physics_entity* ours, struct physics_entity* other) {
   //debugf("handling collision between %lu and %lu!\n", ours->entityId, other->entityId);
+
+  if (ours->type == PROJECTILE || other->type == PROJECTILE) {
+    if (ours->type == PROJECTILE && ours->parentEntityId != other->entityId) {
+      physics_scene_remove_entity(ours);
+    }
+
+    if (other->type == PROJECTILE && other->parentEntityId != ours->entityId) {
+      physics_scene_remove_entity(other);
+    }
+    return;
+  }
 
   float differenceX = ours->position.x - other->position.x;
   float differenceY = ours->position.y - other->position.y;
@@ -104,14 +141,34 @@ static void update_entity_position(struct physics_entity* physicsEntity, uint32_
   float newY = physicsEntity->position.y + dy - (physicsEntity->movementModifier.y * timeDeltaSeconds);
 
   if (newX + physicsEntity->radius >= g_physicsScene.sceneWidth) {
+    if (physicsEntity->type == PROJECTILE) {
+      physics_scene_remove_entity(physicsEntity);
+      return;
+    }
+
     newX = g_physicsScene.sceneWidth - 1 - physicsEntity->radius;
   } else if (newX - physicsEntity->radius < 0) {
+    if (physicsEntity->type == PROJECTILE) {
+      physics_scene_remove_entity(physicsEntity);
+      return;
+    }
+
     newX = 0 + physicsEntity->radius;
   }
 
   if (newY + physicsEntity->radius >= g_physicsScene.sceneHeight) {
+    if (physicsEntity->type == PROJECTILE) {
+      physics_scene_remove_entity(physicsEntity);
+      return;
+    }
+
     newY = g_physicsScene.sceneHeight - 1 - physicsEntity->radius;
   } else if (newY - physicsEntity->radius < 0) {
+    if (physicsEntity->type == PROJECTILE) {
+      physics_scene_remove_entity(physicsEntity);
+      return;
+    }
+
     newY = 0 + physicsEntity->radius;
   }
 

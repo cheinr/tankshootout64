@@ -3,6 +3,7 @@
 
 #include <libdragon.h>
 #include "physics.h"
+#include "projectile.h"
 
 typedef struct tank_s {
   // Loading sprites individually seems to be way faster
@@ -14,6 +15,9 @@ typedef struct tank_s {
   int xSlices;
   int ySlices;
 
+  char aWasPressed;
+
+  projectile_t* projectile;
   struct physics_entity physicsEntity;
 } tank_t;
 

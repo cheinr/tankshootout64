@@ -16,6 +16,8 @@
 
 #define TANK_BODY_SIZE 39
 
+sprite_t* projectileSprite;
+
 static sprite_t* load_sprite(char* filepath) {
   int fp = dfs_open(filepath);
   sprite_t *sprite = malloc(dfs_size(fp));
@@ -47,7 +49,14 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rot
     tank->barrelSprites[i] = load_sprite(path);
   }
 
+  projectileSprite = load_sprite("/projectile16.sprite");
+
+  tank->aWasPressed = 0;
+  tank->projectile = NULL;
+
+  tank->physicsEntity.type = PLAYER;
   tank->physicsEntity.entityId = entityId;
+  tank->physicsEntity.parentEntityId = UINT32_MAX;
   tank->physicsEntity.position.x = xPosition;
   tank->physicsEntity.position.y = yPosition;
   tank->physicsEntity.radius = TANK_BODY_SIZE / 2.0;
@@ -141,6 +150,15 @@ void tank_draw_body(tank_t *tank) {
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES,
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES,
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES);
+
+  if (tank->projectile != NULL) {
+    if (physics_scene_get_entity(tank->projectile->physicsEntity.entityId) == NULL) {
+      projectile_free(tank->projectile);
+      tank->projectile = NULL;
+    } else {
+      projectile_draw(tank->projectile);
+    }
+  }
 }
 
 void tank_draw_barrel(tank_t *tank) {
@@ -154,7 +172,7 @@ void tank_draw_barrel(tank_t *tank) {
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT);
 }
 
-
+#define PI 3.14159
 
 void tank_tick(tank_t *tank, const struct SI_condat *gamepad) {
 
@@ -166,4 +184,26 @@ void tank_tick(tank_t *tank, const struct SI_condat *gamepad) {
 
   tank->physicsEntity.rotationDelta = rotationAdjustment;
   tank->physicsEntity.speed = speed;
+
+
+  if (!tank->aWasPressed && gamepad->A && tank->projectile == NULL) {
+
+    float projectileStartRadius = (TANK_BODY_SIZE/2) + 8 + 8;
+    float tankRotationRadians = tank->physicsEntity.rotation * (PI/180.0);
+
+    float xOffset = cos(tankRotationRadians) * projectileStartRadius;
+    float yOffset = sin(tankRotationRadians) * projectileStartRadius;
+
+    projectile_t* projectile = projectile_init(1337, // TODO
+                                               tank->physicsEntity.entityId,
+                                               projectileSprite,
+                                               tank->physicsEntity.position.x + xOffset,
+                                               tank->physicsEntity.position.y + yOffset,
+                                               tank->physicsEntity.rotation);
+
+    physics_scene_add_entity(&projectile->physicsEntity);
+
+    tank->projectile = projectile;
+  }
+  tank->aWasPressed = gamepad->A;
 }
