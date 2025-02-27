@@ -152,6 +152,7 @@ void tank_draw_body(tank_t *tank) {
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES);
 
   if (tank->projectile != NULL) {
+    // TODO - Should be moved to the tick function
     if (physics_scene_get_entity(tank->projectile->physicsEntity.entityId) == NULL) {
       projectile_free(tank->projectile);
       tank->projectile = NULL;
@@ -174,7 +175,14 @@ void tank_draw_barrel(tank_t *tank) {
 
 #define PI 3.14159
 
-void tank_tick(tank_t *tank, const struct SI_condat *gamepad) {
+void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamepad) {
+
+  if (!gamepadConnected) {
+    tank->physicsEntity.rotationDelta = 0.0;
+    tank->physicsEntity.speed = 0.0;
+    tank->aWasPressed = 0;
+    return;
+  }
 
   char gamepadx = gamepad->x == -1 ? 0 : gamepad->x;
   char gamepady = gamepad->y == -1 ? 0 : gamepad->y;

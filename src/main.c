@@ -66,10 +66,20 @@ int main(void) {
 
     uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
 
-    tank_tick(tank1, &controllers.c[0]);
-    tank_tick(tank2, &controllers.c[1]);
-    tank_tick(tank3, &controllers.c[2]);
-    tank_tick(tank4, &controllers.c[3]);
+    int controllersPresent = get_controllers_present();
+
+    tank_tick(tank1,
+              controllersPresent & CONTROLLER_1_INSERTED,
+              &controllers.c[0]);
+    tank_tick(tank2,
+              controllersPresent & CONTROLLER_2_INSERTED,
+              &controllers.c[1]);
+    tank_tick(tank3,
+              controllersPresent & CONTROLLER_3_INSERTED,
+              &controllers.c[2]);
+    tank_tick(tank4,
+              controllersPresent & CONTROLLER_4_INSERTED,
+              &controllers.c[3]);
 
     physics_scene_tick(timeDeltaUSeconds);
 

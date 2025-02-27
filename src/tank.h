@@ -25,6 +25,6 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rot
 void tank_free(tank_t *tank);
 void tank_draw_body(tank_t *tank);
 void tank_draw_barrel(tank_t *tank);
-void tank_tick(tank_t *tank, const struct SI_condat *gamepad);
+void tank_tick(tank_t *tank, int controllerConnected, const struct SI_condat *gamepad);
 
 #endif
