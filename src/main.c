@@ -11,6 +11,11 @@ uint32_t entityIdCounter = 0;
 
 const uint32_t DOUBLE_BUFFERING = 2;
 
+volatile static int viArrived = 0;
+void on_vi_arrived() {
+  viArrived = 1;
+}
+
 int main(void) {
   display_context_t disp;
 
@@ -46,8 +51,13 @@ int main(void) {
 
   debugf("Starting main loop!\n");
 
+  register_VI_handler(on_vi_arrived);
+
   /* Main loop test */
   while (1) {
+
+    while(!viArrived) { }
+    viArrived = 0;
 
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();
