@@ -16,6 +16,15 @@ void on_vi_arrived() {
   viArrived = 1;
 }
 
+sprite_t* bgSprite;
+
+void load_bg_sprite() {
+  int fp = dfs_open("/tilegrid32.sprite");
+  bgSprite = malloc(dfs_size(fp));
+  dfs_read(bgSprite, 1, dfs_size(fp), fp);
+  dfs_close(fp);
+}
+
 int main(void) {
   display_context_t disp;
 
@@ -32,6 +41,8 @@ int main(void) {
   rdp_init();
   controller_init();
   timer_init();
+
+  load_bg_sprite();
 
   // world coordinates happen to be the same as screen coordinates
   physics_scene_init(resolution_x, resolution_y);
@@ -95,17 +106,16 @@ int main(void) {
     rdp_set_default_clipping();
     // Attach RDP to display
     rdp_attach_display(disp);
-    // Clear the screen with a solid color
-    rdp_enable_primitive_fill();
-    rdp_set_primitive_color(graphics_make_color(50, 168, 82, 255));
-    rdp_draw_filled_rectangle(0, 0, resolution_x, resolution_y);
+
+    // Draw the background
+    rdp_enable_texture_copy();
+    rdp_load_texture(0, 0, MIRROR_DISABLED, bgSprite);
+    rdp_sync(SYNC_PIPE);
+    rdp_draw_textured_rectangle(0, 0, 0, resolution_x, resolution_y, MIRROR_DISABLED);
 
     // =============================
     // Step 2: Draw The Tank
     // =============================
-
-    // Enable sprite display instead of solid color fill
-    rdp_enable_texture_copy();
 
     tank_draw_body(tank1);
     tank_draw_body(tank2);
