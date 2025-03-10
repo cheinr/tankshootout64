@@ -26,6 +26,8 @@ struct physics_entity {
   float rotationDelta;
   float weight;
   struct Vector2 movementModifier;
+
+  char wasHit;
 };
 
 void physics_scene_init(int worldWidth, int worldHeight);

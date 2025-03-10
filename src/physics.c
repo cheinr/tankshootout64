@@ -84,10 +84,12 @@ static void handle_collision(struct physics_entity* ours, struct physics_entity*
 
   if (ours->type == PROJECTILE || other->type == PROJECTILE) {
     if (ours->type == PROJECTILE && ours->parentEntityId != other->entityId) {
+      other->wasHit = 1;
       physics_scene_remove_entity(ours);
     }
 
     if (other->type == PROJECTILE && other->parentEntityId != ours->entityId) {
+      ours->wasHit = 1;
       physics_scene_remove_entity(other);
     }
     return;

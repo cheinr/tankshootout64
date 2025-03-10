@@ -19,12 +19,14 @@ typedef struct tank_s {
 
   projectile_t* projectile;
   struct physics_entity physicsEntity;
+
+  int hitCooldownMillis;
 } tank_t;
 
 tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees);
 void tank_free(tank_t *tank);
 void tank_draw_body(tank_t *tank);
 void tank_draw_barrel(tank_t *tank);
-void tank_tick(tank_t *tank, int controllerConnected, const struct SI_condat *gamepad);
+void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamepad, uint32_t timeDeltaUSeconds);
 
 #endif

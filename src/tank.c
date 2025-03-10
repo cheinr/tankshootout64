@@ -16,6 +16,8 @@
 
 #define TANK_BODY_SIZE 39
 
+#define PI 3.14159
+
 sprite_t* projectileSprite;
 
 static sprite_t* load_sprite(char* filepath) {
@@ -141,7 +143,24 @@ static void tank_draw_sprite(tank_t *tank,
   }
 }
 
+static int calculate_blink_frame(tank_t *tank) {
+
+  if (tank->hitCooldownMillis <= 0) {
+    return 1;
+  }
+
+  float timeSeconds = tank->hitCooldownMillis / 1000.0;
+  float y = sin(10.0*PI*timeSeconds);
+
+  return y >= 0 ? 1 : 0;
+}
+
 void tank_draw_body(tank_t *tank) {
+
+  // Makes the tank 'blink' after it's been hit
+  if (calculate_blink_frame(tank) != 1) {
+    return;
+  }
 
   tank_draw_sprite(tank,
                    tank->bodySprites,
@@ -164,6 +183,11 @@ void tank_draw_body(tank_t *tank) {
 
 void tank_draw_barrel(tank_t *tank) {
 
+  // Makes the tank 'blink' after it's been hit
+  if (calculate_blink_frame(tank) != 1) {
+    return;
+  }
+
   tank_draw_sprite(tank,
                    tank->barrelSprites,
                    TANK_BARREL_SPRITE_HORIZONTAL_SLICES,
@@ -173,9 +197,17 @@ void tank_draw_barrel(tank_t *tank) {
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT);
 }
 
-#define PI 3.14159
 
-void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamepad) {
+void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamepad, uint32_t timeDeltaUSeconds) {
+
+  if (tank->hitCooldownMillis > 0) {
+    tank->hitCooldownMillis -= (timeDeltaUSeconds / 1000);
+  }
+
+  if (tank->physicsEntity.wasHit && tank->hitCooldownMillis <= 0) {
+    tank->physicsEntity.wasHit = 0;
+    tank->hitCooldownMillis = 1000;
+  }
 
   if (!gamepadConnected) {
     tank->physicsEntity.rotationDelta = 0.0;

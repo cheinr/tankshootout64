@@ -81,16 +81,20 @@ int main(void) {
 
     tank_tick(tank1,
               controllersPresent & CONTROLLER_1_INSERTED,
-              &controllers.c[0]);
+              &controllers.c[0],
+              timeDeltaUSeconds);
     tank_tick(tank2,
               controllersPresent & CONTROLLER_2_INSERTED,
-              &controllers.c[1]);
+              &controllers.c[1],
+              timeDeltaUSeconds);
     tank_tick(tank3,
               controllersPresent & CONTROLLER_3_INSERTED,
-              &controllers.c[2]);
+              &controllers.c[2],
+              timeDeltaUSeconds);
     tank_tick(tank4,
               controllersPresent & CONTROLLER_4_INSERTED,
-              &controllers.c[3]);
+              &controllers.c[3],
+              timeDeltaUSeconds);
 
     physics_scene_tick(timeDeltaUSeconds);
 
