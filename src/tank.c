@@ -14,11 +14,16 @@
 #define TANK_BARREL_SPRITE_TRIMMED_PIXELS_TOP_LEFT 31
 #define TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT 11
 
+#define SHIELD_SPRITE_CENTER_OFFSET_X 6
+#define SHIELD_SPRITE_CENTER_OFFSET_Y 7
+
 #define TANK_BODY_SIZE 39
 
 #define PI 3.14159
 
 sprite_t* projectileSprite;
+
+sprite_t* shieldSprites[3];
 
 static sprite_t* load_sprite(char* filepath) {
   int fp = dfs_open(filepath);
@@ -53,8 +58,13 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rot
 
   projectileSprite = load_sprite("/projectile16.sprite");
 
+  shieldSprites[0] = load_sprite("/shield0.sprite");
+  shieldSprites[1] = load_sprite("/shield1.sprite");
+  shieldSprites[2] = load_sprite("/shield2.sprite");
+
   tank->aWasPressed = 0;
   tank->projectile = NULL;
+  tank->health = 3;
 
   tank->physicsEntity.type = PLAYER;
   tank->physicsEntity.entityId = entityId;
@@ -146,7 +156,7 @@ static void tank_draw_sprite(tank_t *tank,
 static int calculate_blink_frame(tank_t *tank) {
 
   if (tank->hitCooldownMillis <= 0) {
-    return 1;
+    return tank->health > 0;
   }
 
   float timeSeconds = tank->hitCooldownMillis / 1000.0;
@@ -195,6 +205,16 @@ void tank_draw_barrel(tank_t *tank) {
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT,
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_TOP_LEFT,
                    TANK_BARREL_SPRITE_TRIMMED_PIXELS_BOTTOM_RIGHT);
+
+  if (tank->health > 0) {
+    int x = (int) tank->physicsEntity.position.x;
+    int y = (int) tank->physicsEntity.position.y;
+
+    int shieldSprite = tank->health - 1;
+
+    rdp_load_texture(0, 0, MIRROR_DISABLED, shieldSprites[shieldSprite]);
+    rdp_draw_sprite(0, x - SHIELD_SPRITE_CENTER_OFFSET_X, y - SHIELD_SPRITE_CENTER_OFFSET_Y, MIRROR_DISABLED);
+  }
 }
 
 
@@ -207,6 +227,14 @@ void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamep
   if (tank->physicsEntity.wasHit && tank->hitCooldownMillis <= 0) {
     tank->physicsEntity.wasHit = 0;
     tank->hitCooldownMillis = 1000;
+
+    if (tank->health > 0) {
+      tank->health--;
+
+      if (tank->health < 1) {
+        physics_scene_remove_entity(tank->physicsEntity.entityId);
+      }
+    }
   }
 
   if (!gamepadConnected) {

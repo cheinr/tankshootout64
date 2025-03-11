@@ -50,11 +50,11 @@ struct physics_entity* physics_scene_get_entity(uint32_t entityId) {
   return NULL;
 }
 
-void physics_scene_remove_entity(struct physics_entity* physicsEntity) {
+void physics_scene_remove_entity(int entityId) {
 
   int entityIndex = -1;
   for (int i = 0; i < g_physicsScene.physicsEntityCount; i++) {
-    if (g_physicsScene.physicsEntities[i]) {
+    if (g_physicsScene.physicsEntities[i]->entityId == entityId) {
       entityIndex = i;
     }
   }
@@ -85,12 +85,12 @@ static void handle_collision(struct physics_entity* ours, struct physics_entity*
   if (ours->type == PROJECTILE || other->type == PROJECTILE) {
     if (ours->type == PROJECTILE && ours->parentEntityId != other->entityId) {
       other->wasHit = 1;
-      physics_scene_remove_entity(ours);
+      physics_scene_remove_entity(ours->entityId);
     }
 
     if (other->type == PROJECTILE && other->parentEntityId != ours->entityId) {
       ours->wasHit = 1;
-      physics_scene_remove_entity(other);
+      physics_scene_remove_entity(other->entityId);
     }
     return;
   }
@@ -144,14 +144,14 @@ static void update_entity_position(struct physics_entity* physicsEntity, uint32_
 
   if (newX + physicsEntity->radius >= g_physicsScene.sceneWidth) {
     if (physicsEntity->type == PROJECTILE) {
-      physics_scene_remove_entity(physicsEntity);
+      physics_scene_remove_entity(physicsEntity->entityId);
       return;
     }
 
     newX = g_physicsScene.sceneWidth - 1 - physicsEntity->radius;
   } else if (newX - physicsEntity->radius < 0) {
     if (physicsEntity->type == PROJECTILE) {
-      physics_scene_remove_entity(physicsEntity);
+      physics_scene_remove_entity(physicsEntity->entityId);
       return;
     }
 
@@ -160,14 +160,14 @@ static void update_entity_position(struct physics_entity* physicsEntity, uint32_
 
   if (newY + physicsEntity->radius >= g_physicsScene.sceneHeight) {
     if (physicsEntity->type == PROJECTILE) {
-      physics_scene_remove_entity(physicsEntity);
+      physics_scene_remove_entity(physicsEntity->entityId);
       return;
     }
 
     newY = g_physicsScene.sceneHeight - 1 - physicsEntity->radius;
   } else if (newY - physicsEntity->radius < 0) {
     if (physicsEntity->type == PROJECTILE) {
-      physics_scene_remove_entity(physicsEntity);
+      physics_scene_remove_entity(physicsEntity->entityId);
       return;
     }
 

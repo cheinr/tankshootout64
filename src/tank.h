@@ -21,6 +21,7 @@ typedef struct tank_s {
   struct physics_entity physicsEntity;
 
   int hitCooldownMillis;
+  char health;
 } tank_t;
 
 tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees);
