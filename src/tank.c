@@ -21,8 +21,12 @@
 
 #define PI 3.14159
 
-sprite_t* projectileSprite;
 
+#define PROJECTILE_SPEED 225.0
+#define MAX_PROJECTILE_RANGE 400.0 // (happens to be the length of the screen diagonal)
+#define PROJECTILE_FIRE_COOLDOWN_MILLIS ((MAX_PROJECTILE_RANGE / PROJECTILE_SPEED) * 1000)
+
+sprite_t* projectileSprite;
 sprite_t* shieldSprites[3];
 
 static sprite_t* load_sprite(char* filepath) {
@@ -181,13 +185,7 @@ void tank_draw_body(tank_t *tank) {
                    TANK_BODY_SPRITE_TRIMMED_PIXELS_ALL_SIDES);
 
   if (tank->projectile != NULL) {
-    // TODO - Should be moved to the tick function
-    if (physics_scene_get_entity(tank->projectile->physicsEntity.entityId) == NULL) {
-      projectile_free(tank->projectile);
-      tank->projectile = NULL;
-    } else {
-      projectile_draw(tank->projectile);
-    }
+    projectile_draw(tank->projectile);
   }
 }
 
@@ -224,6 +222,10 @@ void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamep
     tank->hitCooldownMillis -= (timeDeltaUSeconds / 1000);
   }
 
+  if (tank->fireCooldownMillis > 0) {
+    tank->fireCooldownMillis -= (timeDeltaUSeconds / 1000);
+  }
+
   if (tank->physicsEntity.wasHit && tank->hitCooldownMillis <= 0) {
     tank->physicsEntity.wasHit = 0;
     tank->hitCooldownMillis = 1000;
@@ -253,8 +255,18 @@ void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamep
   tank->physicsEntity.rotationDelta = rotationAdjustment;
   tank->physicsEntity.speed = speed;
 
+  if (tank->projectile != NULL) {
+    if (tank->fireCooldownMillis <= 0) {
+      physics_scene_remove_entity(tank->projectile->physicsEntity.entityId);
+    }
 
-  if (!tank->aWasPressed && gamepad->A && tank->projectile == NULL) {
+    if (physics_scene_get_entity(tank->projectile->physicsEntity.entityId) == NULL) {
+      projectile_free(tank->projectile);
+      tank->projectile = NULL;
+    }
+  }
+
+  if (!tank->aWasPressed && gamepad->A && tank->projectile == NULL && tank->fireCooldownMillis <= 0) {
 
     float projectileStartRadius = (TANK_BODY_SIZE/2) + 8 + 8;
     float tankRotationRadians = tank->physicsEntity.rotation * (PI/180.0);
@@ -267,11 +279,13 @@ void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamep
                                                projectileSprite,
                                                tank->physicsEntity.position.x + xOffset,
                                                tank->physicsEntity.position.y + yOffset,
-                                               tank->physicsEntity.rotation);
+                                               tank->physicsEntity.rotation,
+                                               PROJECTILE_SPEED);
 
     physics_scene_add_entity(&projectile->physicsEntity);
 
     tank->projectile = projectile;
+    tank->fireCooldownMillis = (int) PROJECTILE_FIRE_COOLDOWN_MILLIS;
   }
   tank->aWasPressed = gamepad->A;
 }

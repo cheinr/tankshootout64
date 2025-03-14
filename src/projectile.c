@@ -6,7 +6,7 @@
 
 #include "projectile.h"
 
-projectile_t* projectile_init(uint32_t entityId, uint32_t parentEntityId, sprite_t* sprite, float x, float y, float rotationDegrees) {
+projectile_t* projectile_init(uint32_t entityId, uint32_t parentEntityId, sprite_t* sprite, float x, float y, float rotationDegrees, float speed) {
 
   projectile_t *projectile = malloc(sizeof(projectile_t));
 
@@ -20,7 +20,7 @@ projectile_t* projectile_init(uint32_t entityId, uint32_t parentEntityId, sprite
   projectile->physicsEntity.radius = PROJECTILE_SPRITE_CENTER_OFFSET;
   projectile->physicsEntity.rotation = rotationDegrees;
   projectile->physicsEntity.rotationDelta = 0.0;
-  projectile->physicsEntity.speed = 225.0;
+  projectile->physicsEntity.speed = speed;
   projectile->physicsEntity.weight = 0.0;
 
   return projectile;

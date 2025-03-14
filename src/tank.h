@@ -21,6 +21,7 @@ typedef struct tank_s {
   struct physics_entity physicsEntity;
 
   int hitCooldownMillis;
+  int fireCooldownMillis;
   char health;
 } tank_t;
 
