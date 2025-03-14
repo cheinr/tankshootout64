@@ -25,7 +25,7 @@ typedef struct tank_s {
   char health;
 } tank_t;
 
-tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees);
+tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees);
 void tank_free(tank_t *tank);
 void tank_draw_body(tank_t *tank);
 void tank_draw_barrel(tank_t *tank);

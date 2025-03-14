@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "tank.h"
+#include "id.h"
 
 
 #define ADJUSTED_TANK_SPRITE_SIZE 74
@@ -38,7 +39,7 @@ static sprite_t* load_sprite(char* filepath) {
   return sprite;
 }
 
-tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rotationDegrees) {
+tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
@@ -71,7 +72,7 @@ tank_t *tank_init(uint32_t entityId, float xPosition, float yPosition, float rot
   tank->health = 3;
 
   tank->physicsEntity.type = PLAYER;
-  tank->physicsEntity.entityId = entityId;
+  tank->physicsEntity.entityId = next_entity_id();
   tank->physicsEntity.parentEntityId = UINT32_MAX;
   tank->physicsEntity.position.x = xPosition;
   tank->physicsEntity.position.y = yPosition;
@@ -274,8 +275,7 @@ void tank_tick(tank_t *tank, int gamepadConnected, const struct SI_condat *gamep
     float xOffset = cos(tankRotationRadians) * projectileStartRadius;
     float yOffset = sin(tankRotationRadians) * projectileStartRadius;
 
-    projectile_t* projectile = projectile_init(1337, // TODO
-                                               tank->physicsEntity.entityId,
+    projectile_t* projectile = projectile_init(tank->physicsEntity.entityId,
                                                projectileSprite,
                                                tank->physicsEntity.position.x + xOffset,
                                                tank->physicsEntity.position.y + yOffset,

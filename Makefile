@@ -42,7 +42,8 @@ OBJS = $(BUILD_DIR)/main.o \
 	$(BUILD_DIR)/physics.o \
 	$(BUILD_DIR)/tank.o \
 	$(BUILD_DIR)/projectile.o \
-	$(BUILD_DIR)/fps.o
+	$(BUILD_DIR)/fps.o \
+	$(BUILD_DIR)/id.o
 
 tankshootout64.z64: N64_ROM_TITLE=$(ROM_TITLE)
 tankshootout64.z64: N64_HEADERPATH=boot/ipl3_compat.z64

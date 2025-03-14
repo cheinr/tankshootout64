@@ -5,15 +5,16 @@
 #include <libdragon.h>
 
 #include "projectile.h"
+#include "id.h"
 
-projectile_t* projectile_init(uint32_t entityId, uint32_t parentEntityId, sprite_t* sprite, float x, float y, float rotationDegrees, float speed) {
+projectile_t* projectile_init(uint32_t parentEntityId, sprite_t* sprite, float x, float y, float rotationDegrees, float speed) {
 
   projectile_t *projectile = malloc(sizeof(projectile_t));
 
   projectile->sprite = sprite;
 
   projectile->physicsEntity.type = PROJECTILE;
-  projectile->physicsEntity.entityId = entityId;
+  projectile->physicsEntity.entityId = next_entity_id();
   projectile->physicsEntity.parentEntityId = parentEntityId;
   projectile->physicsEntity.position.x = x;
   projectile->physicsEntity.position.y = y;
