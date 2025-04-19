@@ -3,9 +3,11 @@
 
 #include <libdragon.h>
 
+#include "game.h"
 #include "tank.h"
 #include "physics.h"
 #include "fps.h"
+#include "ui.h"
 
 const uint32_t DOUBLE_BUFFERING = 2;
 
@@ -42,11 +44,15 @@ int main(void) {
 
   load_bg_sprite();
 
+  ui_init();
+
   // world coordinates happen to be the same as screen coordinates
   physics_scene_init(resolution_x, resolution_y);
 
   // Allows debugf statements to show up in emulator logs
   debug_init_isviewer();
+
+  game_t* game = game_init();
 
   tank_t* tank1 = tank_init(32, 32, 45);
   tank_t* tank2 = tank_init(resolution_x - 32, 32, 135);
@@ -75,26 +81,33 @@ int main(void) {
 
     uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
 
+    game_tick(timeDeltaUSeconds);
+
     int controllersPresent = get_controllers_present();
 
-    tank_tick(tank1,
-              controllersPresent & CONTROLLER_1_INSERTED,
-              &controllers.c[0],
-              timeDeltaUSeconds);
-    tank_tick(tank2,
-              controllersPresent & CONTROLLER_2_INSERTED,
-              &controllers.c[1],
-              timeDeltaUSeconds);
-    tank_tick(tank3,
-              controllersPresent & CONTROLLER_3_INSERTED,
-              &controllers.c[2],
-              timeDeltaUSeconds);
-    tank_tick(tank4,
-              controllersPresent & CONTROLLER_4_INSERTED,
-              &controllers.c[3],
-              timeDeltaUSeconds);
+    if (game->state == RUNNING) {
+      tank_tick(tank1,
+                controllersPresent & CONTROLLER_1_INSERTED,
+                &controllers.c[0],
+                timeDeltaUSeconds);
+      tank_tick(tank2,
+                controllersPresent & CONTROLLER_2_INSERTED,
+                &controllers.c[1],
+                timeDeltaUSeconds);
+      tank_tick(tank3,
+                controllersPresent & CONTROLLER_3_INSERTED,
+                &controllers.c[2],
+                timeDeltaUSeconds);
+      tank_tick(tank4,
+                controllersPresent & CONTROLLER_4_INSERTED,
+                &controllers.c[3],
+                timeDeltaUSeconds);
 
-    physics_scene_tick(timeDeltaUSeconds);
+      physics_scene_tick(timeDeltaUSeconds);
+
+    }
+
+    ui_tick(game, timeDeltaUSeconds);
 
     while(!(disp = display_lock()));
 
@@ -128,6 +141,8 @@ int main(void) {
     tank_draw_barrel(tank2);
     tank_draw_barrel(tank3);
     tank_draw_barrel(tank4);
+
+    ui_draw();
 
     rdp_detach_display();
 
