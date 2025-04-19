@@ -68,6 +68,10 @@ int main(void) {
 
   register_VI_handler(on_vi_arrived);
 
+  // init fps last so timing doesn't account for all the loading
+  // we've just done
+  fps_init();
+
   /* Main loop test */
   while (1) {
 

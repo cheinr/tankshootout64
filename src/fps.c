@@ -9,6 +9,14 @@ uint32_t numFrameTimeSamples = 0;
 uint32_t cUpPressed = 0;
 uint32_t drawFPS = 0;
 
+void fps_init() {
+  uint32_t timerTicks = timer_ticks();
+  uint64_t frameTimeUSeconds = TIMER_MICROS_LL(timerTicks);
+
+  lastFrameTimeUSeconds = frameTimeUSeconds;
+}
+
+
 void fps_tick(const struct SI_condat *gamepad) {
   frameCount++;
   uint32_t timerTicks = timer_ticks();
