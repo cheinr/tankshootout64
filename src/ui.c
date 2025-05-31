@@ -7,6 +7,7 @@
 
 #define NUM_READY_TEXT_SPRITES 4
 #define NUM_GO_TEXT_SPRITES 2
+#define NUM_WINS_TEXT_SPRITES 4
 #define USECONDS_PER_SECOND 1000000
 #define PI 3.14159
 
@@ -16,9 +17,12 @@ int goTextTimerUSeconds = 0;
 
 char shouldDrawReadyText = 0;
 char shouldDrawGoText = 0;
+int winningPlayer = -1;
 
 sprite_t* readyTextSprites[NUM_READY_TEXT_SPRITES];
 sprite_t* goTextSprites[NUM_GO_TEXT_SPRITES];
+sprite_t* pTextSprites[4];
+sprite_t* winsTextSprites[NUM_WINS_TEXT_SPRITES];
 
 uint32_t totalUiTimeMillis = 0;
 
@@ -47,6 +51,20 @@ void ui_init() {
 
     goTextSprites[i] = load_sprite(path);
   }
+
+  for (i = 0; i < 4; i++) {
+    char path[32];
+    sprintf(path, "/p%dtext32x32.sprite", i+1);
+
+    pTextSprites[i] = load_sprite(path);
+  }
+
+  for (i = 0; i < NUM_WINS_TEXT_SPRITES; i++) {
+    char path[32];
+    sprintf(path, "/winstext32x32-%d.sprite", i);
+
+    winsTextSprites[i] = load_sprite(path);
+  }
 }
 
 void ui_tick(game_t* game, uint32_t timeDeltaUSeconds) {
@@ -68,6 +86,8 @@ void ui_tick(game_t* game, uint32_t timeDeltaUSeconds) {
   if (goTextTimerUSeconds > 0) {
     goTextTimerUSeconds -= timeDeltaUSeconds;
   }
+
+  winningPlayer = game->winningPlayer;
 }
 
 
@@ -103,6 +123,31 @@ void ui_draw() {
       int startY = 120 - (16.0*goTextScale);
 
       rdp_draw_sprite_scaled(0,  startX + (32.0 * goTextScale * i) - i, startY, goTextScale, goTextScale, MIRROR_DISABLED);
+    }
+  }
+
+  if (winningPlayer != -1) {
+
+    rdp_load_texture(0, 0, MIRROR_DISABLED, pTextSprites[winningPlayer]);
+
+    rdp_sync(SYNC_PIPE);
+
+    float scale = 1.0;
+    int startX = 160 - ((160*scale) / 2.0);
+    int startY = 120 - (16.0*scale);
+
+    rdp_draw_sprite_scaled(0,  startX, startY, scale, scale, MIRROR_DISABLED);
+
+    for (int i = 0; i < NUM_WINS_TEXT_SPRITES; i++) {
+      rdp_load_texture(0, 0, MIRROR_DISABLED, winsTextSprites[i]);
+
+      rdp_sync(SYNC_PIPE);
+
+      float scale = 1.0;
+      int startX = 160 - ((160.0*scale) / 2.0) + 44;
+      int startY = 120 - (16.0*scale);
+
+      rdp_draw_sprite_scaled(0,  startX + (32.0 * scale * i) - i, startY, scale, scale, MIRROR_DISABLED);
     }
   }
 }

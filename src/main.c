@@ -54,15 +54,17 @@ int main(void) {
 
   game_t* game = game_init();
 
-  tank_t* tank1 = tank_init(32, 32, 45);
-  tank_t* tank2 = tank_init(resolution_x - 32, 32, 135);
-  tank_t* tank3 = tank_init(32, resolution_y - 32, 315);
-  tank_t* tank4 = tank_init(resolution_x - 32, resolution_y - 32, 225);
+  tank_t* tanks[4];
 
-  physics_scene_add_entity(&tank1->physicsEntity);
-  physics_scene_add_entity(&tank2->physicsEntity);
-  physics_scene_add_entity(&tank3->physicsEntity);
-  physics_scene_add_entity(&tank4->physicsEntity);
+  tanks[0] = tank_init(32, 32, 45);
+  tanks[1] = tank_init(resolution_x - 32, 32, 135);
+  tanks[2] = tank_init(32, resolution_y - 32, 315);
+  tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225);
+
+  physics_scene_add_entity(&tanks[0]->physicsEntity);
+  physics_scene_add_entity(&tanks[1]->physicsEntity);
+  physics_scene_add_entity(&tanks[2]->physicsEntity);
+  physics_scene_add_entity(&tanks[3]->physicsEntity);
 
   debugf("Starting main loop!\n");
 
@@ -85,24 +87,24 @@ int main(void) {
 
     uint32_t timeDeltaUSeconds = fps_get_tick_delta_useconds();
 
-    game_tick(timeDeltaUSeconds);
+    game_tick(timeDeltaUSeconds, tanks);
 
     int controllersPresent = get_controllers_present();
 
     if (game->state == RUNNING) {
-      tank_tick(tank1,
+      tank_tick(tanks[0],
                 controllersPresent & CONTROLLER_1_INSERTED,
                 &controllers.c[0],
                 timeDeltaUSeconds);
-      tank_tick(tank2,
+      tank_tick(tanks[1],
                 controllersPresent & CONTROLLER_2_INSERTED,
                 &controllers.c[1],
                 timeDeltaUSeconds);
-      tank_tick(tank3,
+      tank_tick(tanks[2],
                 controllersPresent & CONTROLLER_3_INSERTED,
                 &controllers.c[2],
                 timeDeltaUSeconds);
-      tank_tick(tank4,
+      tank_tick(tanks[3],
                 controllersPresent & CONTROLLER_4_INSERTED,
                 &controllers.c[3],
                 timeDeltaUSeconds);
@@ -136,15 +138,15 @@ int main(void) {
     // Step 2: Draw The Tank
     // =============================
 
-    tank_draw_body(tank1);
-    tank_draw_body(tank2);
-    tank_draw_body(tank3);
-    tank_draw_body(tank4);
+    tank_draw_body(tanks[0]);
+    tank_draw_body(tanks[1]);
+    tank_draw_body(tanks[2]);
+    tank_draw_body(tanks[3]);
 
-    tank_draw_barrel(tank1);
-    tank_draw_barrel(tank2);
-    tank_draw_barrel(tank3);
-    tank_draw_barrel(tank4);
+    tank_draw_barrel(tanks[0]);
+    tank_draw_barrel(tanks[1]);
+    tank_draw_barrel(tanks[2]);
+    tank_draw_barrel(tanks[3]);
 
     ui_draw();
 

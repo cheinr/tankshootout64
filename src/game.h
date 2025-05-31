@@ -1,6 +1,8 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include "tank.h"
+
 enum GameState {
   STARTING,
   RUNNING,
@@ -9,9 +11,10 @@ enum GameState {
 
 typedef struct game_s {
   enum GameState state;
+  char winningPlayer;
 } game_t;
 
 game_t* game_init();
-void game_tick(uint32_t timeDeltaUSeconds);
+void game_tick(uint32_t timeDeltaUSeconds, tank_t** tanks);
 
 #endif
