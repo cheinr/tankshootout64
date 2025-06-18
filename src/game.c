@@ -7,10 +7,17 @@
 game_t game;
 
 uint32_t totalRunTimeUSeconds = 0;
+uint32_t gameEndedAt = -1;
 
-game_t* game_init() {
+void game_start() {
   game.state = STARTING;
   game.winningPlayer = -1;
+  gameEndedAt = -1;
+  totalRunTimeUSeconds = 0;
+}
+
+game_t* game_init() {
+  game.state = INITIALIZING;
   return &game;
 }
 
@@ -44,6 +51,13 @@ void game_tick(uint32_t timeDeltaUSeconds, tank_t** tanks) {
     if (lastTankStanding != -1) {
 
       game.winningPlayer = lastTankStanding;
+      game.state = ENDED;
+    }
+  } else if (game.state == ENDED) {
+    if (gameEndedAt == -1) {
+      gameEndedAt = totalRunTimeUSeconds;
+    } else if ((totalRunTimeUSeconds - gameEndedAt) > 5*ONE_SECOND_USECONDS) {
+      game.state = INITIALIZING;
     }
   }
 }

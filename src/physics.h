@@ -30,6 +30,7 @@ struct physics_entity {
   char wasHit;
 };
 
+void physics_scene_free();
 void physics_scene_init(int worldWidth, int worldHeight);
 void physics_scene_add_entity(struct physics_entity* physicsEntity);
 struct physics_entity* physics_scene_get_entity(uint32_t entityId);

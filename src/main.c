@@ -8,6 +8,7 @@
 #include "physics.h"
 #include "fps.h"
 #include "ui.h"
+#include "string.h"
 
 const uint32_t DOUBLE_BUFFERING = 2;
 
@@ -44,8 +45,6 @@ int main(void) {
 
   load_bg_sprite();
 
-  ui_init();
-
   // world coordinates happen to be the same as screen coordinates
   physics_scene_init(resolution_x, resolution_y);
 
@@ -55,30 +54,47 @@ int main(void) {
   game_t* game = game_init();
 
   tank_t* tanks[4];
-
-  tanks[0] = tank_init(32, 32, 45);
-  tanks[1] = tank_init(resolution_x - 32, 32, 135);
-  tanks[2] = tank_init(32, resolution_y - 32, 315);
-  tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225);
-
-  physics_scene_add_entity(&tanks[0]->physicsEntity);
-  physics_scene_add_entity(&tanks[1]->physicsEntity);
-  physics_scene_add_entity(&tanks[2]->physicsEntity);
-  physics_scene_add_entity(&tanks[3]->physicsEntity);
+  memset(tanks, 0, sizeof(tanks));
 
   debugf("Starting main loop!\n");
 
   register_VI_handler(on_vi_arrived);
-
-  // init fps last so timing doesn't account for all the loading
-  // we've just done
-  fps_init();
 
   /* Main loop test */
   while (1) {
 
     while(!viArrived) { }
     viArrived = 0;
+
+    if (game->state == INITIALIZING) {
+
+      physics_scene_free();
+      physics_scene_init(resolution_x, resolution_y);
+
+      for (int i = 0; i < 4; i++) {
+        if (tanks[i] != NULL) {
+          tank_free(tanks[i]);
+        }
+      }
+
+      tanks[0] = tank_init(32, 32, 45);
+      tanks[1] = tank_init(resolution_x - 32, 32, 135);
+      tanks[2] = tank_init(32, resolution_y - 32, 315);
+      tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225);
+
+      // TODO - Move into tank.c
+      physics_scene_add_entity(&tanks[0]->physicsEntity);
+      physics_scene_add_entity(&tanks[1]->physicsEntity);
+      physics_scene_add_entity(&tanks[2]->physicsEntity);
+      physics_scene_add_entity(&tanks[3]->physicsEntity);
+
+      // init fps last so timing doesn't account for all the loading
+      // we've just done
+      fps_init();
+
+      ui_init();
+      game_start();
+    }
 
     controller_scan();
     const SI_controllers_state_t controllers = get_keys_pressed();

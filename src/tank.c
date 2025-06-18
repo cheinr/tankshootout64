@@ -70,6 +70,7 @@ tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
   tank->aWasPressed = 0;
   tank->projectile = NULL;
   tank->health = 3;
+  tank->hitCooldownMillis = 0;
 
   tank->physicsEntity.type = PLAYER;
   tank->physicsEntity.entityId = next_entity_id();
@@ -81,6 +82,7 @@ tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
   tank->physicsEntity.rotationDelta = 0.0;
   tank->physicsEntity.speed = 0.0;
   tank->physicsEntity.weight = 10.0;
+  tank->physicsEntity.wasHit = 0;
 
   return tank;
 }
@@ -91,6 +93,9 @@ void tank_free(tank_t *tank) {
   }
   for (int i = 0; i < 90; i++) {
     free(tank->barrelSprites[i]);
+  }
+  if (tank->projectile != NULL) {
+    projectile_free(tank->projectile);
   }
   free(tank);
 }

@@ -19,6 +19,10 @@ struct physics_scene {
 
 struct physics_scene g_physicsScene;
 
+void physics_scene_free() {
+  free(g_physicsScene.physicsEntities);
+}
+
 void physics_scene_init(int worldWidth, int worldHeight) {
   g_physicsScene.sceneWidth = worldWidth;
   g_physicsScene.sceneHeight = worldHeight;
