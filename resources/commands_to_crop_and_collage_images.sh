@@ -13,6 +13,7 @@ for filename in ./*.png; do \
     convert +repage -crop 32x64+32+0 $filename 32x64/$filename-1.png; \
 done
 
+# barrel
 for filename in ./*.png; do convert +repage -crop 32x32+31+31 $filename out/$filename; done
 
 montage *.png -background 'rgba(0,0,0,0)' -tile 9x10 -geometry +0+0 ../../combined-shifted.png

@@ -83,14 +83,13 @@ static sprite_t* get_sub_sprite(sprite_t* source, int stride) {
 
   return subSprite;
 }
-
-
-tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
+    
+tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees, const char* color) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
   char path[32];
-  sprintf(path, "/tanks_redtank-body.sprite");
+  sprintf(path, "/tanks_%stank-body.sprite", color);
   sprite_t* spritesheetBody = load_sprite(path);
 
   for (int i = 0; i < 180; i++) {
@@ -99,7 +98,7 @@ tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
 
   free(spritesheetBody);
 
-  sprintf(path, "/tanks_redtank-barrel.sprite");
+  sprintf(path, "/tanks_%stank-barrel.sprite", color);
   sprite_t* spritesheetBarrel = load_sprite(path);
 
   for (int i = 0; i < 90; i++) {
