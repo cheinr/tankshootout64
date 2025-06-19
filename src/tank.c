@@ -39,24 +39,24 @@ static sprite_t* load_sprite(char* filepath) {
   return sprite;
 }
 
-tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
+tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees, const char* color) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
   for (int i = 0; i < 90; i++) {
-    char path[32];
-    sprintf(path, "/redtank_body_%04d.png-0.sprite", i+1);
+    char path[50];
+    sprintf(path, "/%stank_body_%04d.png-0.sprite", color, i+1);
 
     tank->bodySprites[i*2] = load_sprite(path);
 
-    sprintf(path, "/redtank_body_%04d.png-1.sprite", i+1);
+    sprintf(path, "/%stank_body_%04d.png-1.sprite", color, i+1);
 
     tank->bodySprites[(i*2) + 1] = load_sprite(path);
   }
 
   for (int i = 0; i < 90; i++) {
-    char path[32];
-    sprintf(path, "/redtank_barrel_%04d.sprite", i+1);
+    char path[50];
+    sprintf(path, "/%stank_barrel_%04d.sprite", color, i+1);
 
     tank->barrelSprites[i] = load_sprite(path);
   }

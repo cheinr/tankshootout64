@@ -12,6 +12,11 @@
 
 const uint32_t DOUBLE_BUFFERING = 2;
 
+const char COLOR_BLUE[] = "blue";
+const char COLOR_GREEN[] = "green";
+const char COLOR_RED[] = "red";
+const char COLOR_YELLOW[] = "yellow";
+
 volatile static int viArrived = 0;
 void on_vi_arrived() {
   viArrived = 1;
@@ -77,10 +82,10 @@ int main(void) {
         }
       }
 
-      tanks[0] = tank_init(32, 32, 45);
-      tanks[1] = tank_init(resolution_x - 32, 32, 135);
-      tanks[2] = tank_init(32, resolution_y - 32, 315);
-      tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225);
+      tanks[0] = tank_init(32, 32, 45, COLOR_RED);
+      tanks[1] = tank_init(resolution_x - 32, 32, 135, COLOR_BLUE);
+      tanks[2] = tank_init(32, resolution_y - 32, 315, COLOR_GREEN);
+      tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225, COLOR_YELLOW);
 
       // TODO - Move into tank.c
       physics_scene_add_entity(&tanks[0]->physicsEntity);
