@@ -1,6 +1,6 @@
 [submodule "libdragon"]
 	path = libdragon
-	url = git@github.com:DragonMinded/libdragon.git
+	url = git@github.com:cheinr/libdragon.git
 [submodule "boot/libdragon"]
 	path = boot/libdragon
 	url = git@github.com:cheinr/libdragon.git
