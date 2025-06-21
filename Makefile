@@ -9,9 +9,13 @@ IMAGES_DIR=$(SOURCE_DIR)/images
 IMAGE_FILES=$(wildcard $(IMAGES_DIR)/*.png)
 
 IMAGE_FILES=$(wildcard $(IMAGES_DIR)/*tank/*/*.png) $(wildcard $(IMAGES_DIR)/*.png)
+TANK_BODY_IMAGESHEET_FILES=$(wildcard $(IMAGES_DIR)/tanks/*-body.png)
+TANK_BARREL_IMAGESHEET_FILES=$(wildcard $(IMAGES_DIR)/tanks/*-barrel.png)
 
 SPRITE_DIR=$(BUILD_DIR)/filesystem
 SPRITE_FILES=$(subst $(subst /,_,$(IMAGES_DIR)/),$(SPRITE_DIR)/,$(subst /,_,$(IMAGE_FILES:.png=.sprite)))
+TANK_BODY_SPRITESHEET_FILES=$(subst $(subst /,_,$(IMAGES_DIR)/),$(SPRITE_DIR)/,$(subst /,_,$(TANK_BODY_IMAGESHEET_FILES:.png=.sprite)))
+TANK_BARREL_SPRITESHEET_FILES=$(subst $(subst /,_,$(IMAGES_DIR)/),$(SPRITE_DIR)/,$(subst /,_,$(TANK_BARREL_IMAGESHEET_FILES:.png=.sprite)))
 
 ROM_TITLE="Tank Shootout 64"
 
@@ -34,9 +38,19 @@ $(SPRITE_FILES): $(IMAGE_FILES) $(SPRITE_DIR)
 	@echo "source: $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@)))"
 	$(TOOLS_MKSPRITE) 16 1 1 $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@))) $@
 
+$(TANK_BODY_SPRITESHEET_FILES): $(TANK_BODY_IMAGESHEET_FILES) $(SPRITE_DIR)
+	@echo "target: $@"
+	@echo "source: $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@)))"
+	$(TOOLS_MKSPRITE) 16 18 10 $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@))) $@
 
-$(BUILD_DIR)/tankshootout64.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
-$(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(SPRITE_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
+$(TANK_BARREL_SPRITESHEET_FILES): $(TANK_BODY_IMAGESHEET_FILES) $(SPRITE_DIR)
+	@echo "target: $@"
+	@echo "source: $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@)))"
+	$(TOOLS_MKSPRITE) 16 9 10 $(subst $(SPRITE_DIR),$(IMAGES_DIR),$(subst sprite,png,$(subst _,/,$@))) $@
+
+
+$(BUILD_DIR)/tankshootout64.dfs: $(SPRITE_FILES) $(TANK_BODY_SPRITESHEET_FILES) $(TANK_BARREL_SPRITESHEET_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
+$(BUILD_DIR)/tankshootout64.emu-compat.dfs: $(SPRITE_FILES) $(TANK_BODY_SPRITESHEET_FILES) $(TANK_BARREL_SPRITESHEET_FILES) $(wildcard $(BUILD_DIR)/filesystem/*)
 
 OBJS = $(BUILD_DIR)/main.o \
 	$(BUILD_DIR)/physics.o \

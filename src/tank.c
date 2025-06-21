@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <libdragon.h>
 #include <math.h>
+#include <string.h>
 
 #include "tank.h"
 #include "id.h"
@@ -39,27 +40,73 @@ static sprite_t* load_sprite(char* filepath) {
   return sprite;
 }
 
+/*
+  rdp "stride" functions appear to perform poorly, so this function
+  allows us to get a tile from a sprite using the CPU.
+ */
+static sprite_t* get_sub_sprite(sprite_t* source, int stride) {
+
+  int width = source->width / source->hslices;
+  int height = source->height / source->vslices;
+
+  int bytesPerPixel = source->bitdepth;
+  int hSlices = source->hslices;
+  int srcWidth = source->width;
+
+  sprite_t* subSprite = malloc(sizeof(sprite_t) + (width * height * bytesPerPixel));
+
+  subSprite->width = width;
+  subSprite->height = height;
+  subSprite->bitdepth = bytesPerPixel;
+  subSprite->hslices = 1;
+  subSprite->vslices = 1;
+  subSprite->format = source->format;
+  memset(subSprite->data, 0, (width * height * bytesPerPixel));
+
+  char* dstBytes = (char*) subSprite->data;
+  char* srcBytes = (char*) source->data;
+
+  int srcStartRow = (stride / hSlices) * height;
+  int srcStartColumn = stride % hSlices;
+
+  for (int j = 0; j < height; j++) {
+    for (int k = 0; k < width; k++) {
+
+      int dstStart = ((j * width) + k) * 2;
+      int srcStart = (((srcStartRow + j) * srcWidth) + (srcStartColumn * width) + k) * 2;
+
+      for (int l = 0; l < bytesPerPixel; l++) {
+        dstBytes[dstStart + l] = srcBytes[srcStart + l];
+      }
+    }
+  }
+
+  return subSprite;
+}
+
+
 tank_t *tank_init(float xPosition, float yPosition, float rotationDegrees) {
 
   tank_t *tank = malloc(sizeof(tank_t));
 
-  for (int i = 0; i < 90; i++) {
-    char path[32];
-    sprintf(path, "/redtank_body_%04d.png-0.sprite", i+1);
+  char path[32];
+  sprintf(path, "/tanks_redtank-body.sprite");
+  sprite_t* spritesheetBody = load_sprite(path);
 
-    tank->bodySprites[i*2] = load_sprite(path);
-
-    sprintf(path, "/redtank_body_%04d.png-1.sprite", i+1);
-
-    tank->bodySprites[(i*2) + 1] = load_sprite(path);
+  for (int i = 0; i < 180; i++) {
+    tank->bodySprites[i] = get_sub_sprite(spritesheetBody, i);
   }
 
-  for (int i = 0; i < 90; i++) {
-    char path[32];
-    sprintf(path, "/redtank_barrel_%04d.sprite", i+1);
+  free(spritesheetBody);
 
-    tank->barrelSprites[i] = load_sprite(path);
+  sprintf(path, "/tanks_redtank-barrel.sprite");
+  sprite_t* spritesheetBarrel = load_sprite(path);
+
+  for (int i = 0; i < 90; i++) {
+    tank->barrelSprites[i] = get_sub_sprite(spritesheetBarrel, i);
   }
+
+  free(spritesheetBarrel);
 
   projectileSprite = load_sprite("/projectile16.sprite");
 
