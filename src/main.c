@@ -112,7 +112,7 @@ int main(void) {
 
     int controllersPresent = get_controllers_present();
 
-    if (game->state == RUNNING) {
+    if (game->state == RUNNING || game->state == ENDED) {
       tank_tick(tanks[0],
                 controllersPresent & CONTROLLER_1_INSERTED,
                 &controllers.c[0],
