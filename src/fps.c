@@ -1,8 +1,8 @@
 #include <libdragon.h>
 #include <assert.h>
 
-uint32_t frameCount = 0;
-uint32_t lastFrameTimeUSeconds = 0;
+uint64_t frameCount = 0;
+uint64_t lastFrameTimeUSeconds = 0;
 uint32_t frameTimeUSecondsSamples[10];
 uint32_t numFrameTimeSamples = 0;
 
@@ -10,7 +10,7 @@ uint32_t cUpPressed = 0;
 uint32_t drawFPS = 0;
 
 void fps_init() {
-  uint32_t timerTicks = timer_ticks();
+  uint64_t timerTicks = timer_ticks();
   uint64_t frameTimeUSeconds = TIMER_MICROS_LL(timerTicks);
 
   lastFrameTimeUSeconds = frameTimeUSeconds;
@@ -19,7 +19,7 @@ void fps_init() {
 
 void fps_tick(const struct SI_condat *gamepad) {
   frameCount++;
-  uint32_t timerTicks = timer_ticks();
+  uint64_t timerTicks = timer_ticks();
   uint64_t frameTimeUSeconds = TIMER_MICROS_LL(timerTicks);
 
   if (numFrameTimeSamples >= 10) {
@@ -46,7 +46,7 @@ uint32_t fps_get_tick_delta_useconds() {
 }
 
 static float calculate_average_fps() {
-  uint32_t totalSampleTime = 0;
+  uint64_t totalSampleTime = 0;
   for (int i = 0; i < numFrameTimeSamples; i++) {
     totalSampleTime += frameTimeUSecondsSamples[i];
   }

@@ -6,8 +6,8 @@
 
 game_t game;
 
-uint32_t totalRunTimeUSeconds = 0;
-uint32_t gameEndedAt = -1;
+uint64_t totalRunTimeUSeconds = 0;
+uint64_t gameEndedAt = -1;
 
 void game_start() {
   game.state = STARTING;
