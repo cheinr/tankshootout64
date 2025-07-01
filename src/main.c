@@ -82,8 +82,8 @@ int main(void) {
         }
       }
 
-      tanks[0] = tank_init(32, 32, 45, COLOR_RED);
-      tanks[1] = tank_init(resolution_x - 32, 32, 135, COLOR_BLUE);
+      tanks[0] = tank_init(32, 32, 45, COLOR_BLUE);
+      tanks[1] = tank_init(resolution_x - 32, 32, 135, COLOR_RED);
       tanks[2] = tank_init(32, resolution_y - 32, 315, COLOR_GREEN);
       tanks[3] = tank_init(resolution_x - 32, resolution_y - 32, 225, COLOR_YELLOW);
 
